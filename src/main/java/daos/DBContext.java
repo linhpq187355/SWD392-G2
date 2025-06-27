@@ -9,12 +9,23 @@ public class DBContext {
     public DBContext()
     {
         try {
-            String url = "jdbc:sqlserver://localhost:1433;databaseName=";
-            String username = "";
-            String password = "";
+            String url = "jdbc:sqlserver://localhost:1433;databaseName=OnlineShopDBv2 ;encrypt=true;trustServerCertificate=true;";
+            String username = "sa";
+            String password = "1234";
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+
             connection = DriverManager.getConnection(url, username, password);
         } catch (ClassNotFoundException | SQLException ex) {
+            System.out.println(ex);
+        }
+    }
+
+    public static void main(String[] args) {
+        try{
+            DBContext db = new DBContext();
+            System.out.println("ok");
+        }
+        catch (Exception ex){
             System.out.println(ex);
         }
     }
