@@ -38,21 +38,8 @@
 <body>
 
 <!-- Header -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container">
-        <a class="navbar-brand" href="#">MyShop</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Cart</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<jsp:include page="header.jsp"/>
+
 
 <!-- Main -->
 <div class="container my-5">
@@ -68,23 +55,29 @@
         </tr>
         </thead>
         <tbody>
-        <c:forEach var="item" items="${sessionScope.items}" varStatus="i">
+        <c:forEach var="item" items="${items}" varStatus="i">
             <tr>
                 <td>
                     <div class="product-img">
-                        <img src="${sessionScope.products[i.index].img != null ? sessionScope.products[i.index].img : 'default.jpg'}" class="img-fluid rounded-3" alt="Image" width="80" height="80">
+                        <img src="${products[i.index].img != null ? products[i.index].img : 'default.jpg'}"
+                             class="img-fluid rounded-3" alt="Image" width="80" height="80">
                     </div>
                 </td>
                 <td>
-                    <strong>${sessionScope.products[i.index].name}</strong><br>
-                        ${sessionScope.products[i.index].description}
+                    <strong>${products[i.index].name}</strong><br>
+                        ${products[i.index].description}
                 </td>
                 <td>
-                    <span class="price-old">${sessionScope.products[i.index].price} đ</span><br>
-                    <span class="price-new">${sessionScope.products[i.index].price * 0.9} đ</span>
+                    <span class="price-old">${products[i.index].price} đ</span><br>
+                    <span class="price-new">${products[i.index].price * 0.9} đ</span>
                 </td>
-                <td>${item.quantity}</td>
-                <td><strong>${item.quantity * sessionScope.products[i.index].price * 0.9} đ</strong></td>
+                <td>
+                    <form action="cartUpdate" method="post" class="d-flex">
+                        <input name="quantity" type="number" min="1" value="${item.quantity}"
+                               class="form-control form-control-sm mx-1 text-center" style="width: 60px;">
+                </form>
+                </td>
+                <td><strong>${item.quantity * products[i.index].price * 0.9} đ</strong></td>
             </tr>
         </c:forEach>
         </tbody>
@@ -130,8 +123,6 @@
                         </select>
                     </div>
                 </div>
-
-
                 <div class="mb-3">
                     <label class="form-label">Detail address</label>
                     <input type="text" name="receiveAddress" class="form-control" required>
@@ -141,156 +132,161 @@
                     <textarea name="note" class="form-control note-area"></textarea>
                 </div>
             </div>
+                <div class="col-md-4">
+                    <div class="bg-light p-4 rounded" id="summaryData"
+                    data-subtotal="${subtotal}" data-discount="${discount}">
+                    <h4>Summary</h4>
+                    <p><strong>Subtotal:</strong> ${subtotal} đ</p>
+                    <p><strong>Shipping Fee:</strong> <span id="shippingFeeDisplay">...</span></p>
+                    <p><strong>Discount:</strong> ${discount} đ</p>
+                    <p class="total-area">Total Cost: <span id="totalCostDisplay">...</span></p>
 
+
+                        <hr class="my-4">
+                        <h5>Payment Method</h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="shippingMethod" value="Visa" id="visa">
+                            <label class="form-check-label" for="visa">Visa</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="shippingMethod" value="Card" id="card">
+                            <label class="form-check-label" for="card">Card</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="shippingMethod" value="COD" id="cod" checked>
+                            <label class="form-check-label" for="cod">COD</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 mt-3">Confirm</button>
+                    </div>
+                </div>
             <!-- Right Column sẽ xử lý ở phần khác -->
         </form>
     </div>
-    <script>
-        const GHN_TOKEN = "a18e846b-51b8-11f0-928a-1a690f81b498";
+<script>
+    const contextPath = "${pageContext.request.contextPath}";
+    const GHN_TOKEN = "a18e846b-51b8-11f0-928a-1a690f81b498";
 
-        document.addEventListener("DOMContentLoaded", function () {
-            loadProvinces();
-
-            document.getElementById("provinceSelect").addEventListener("change", function () {
-                const provinceId = this.value;
-                loadDistricts(provinceId);
+    function loadProvinces() {
+        fetch("https://online-gateway.ghn.vn/shiip/public-api/master-data/province", {
+            method: "GET",
+            headers: { "Token": GHN_TOKEN }
+        })
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById("provinceSelect");
+                select.innerHTML = '<option value="">Select province</option>';
+                data.data.forEach(p => {
+                    const opt = document.createElement("option");
+                    opt.value = p.ProvinceID;
+                    opt.text = p.ProvinceName;
+                    select.appendChild(opt);
+                });
             });
+    }
 
-            document.getElementById("districtSelect").addEventListener("change", function () {
-                const districtId = this.value;
-                loadWards(districtId);
+    function loadDistricts(provinceId) {
+        fetch("https://online-gateway.ghn.vn/shiip/public-api/master-data/district", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Token": GHN_TOKEN
+            },
+            body: JSON.stringify({ province_id: parseInt(provinceId) })
+        })
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById("districtSelect");
+                select.innerHTML = '<option value="">Select district</option>';
+                data.data.forEach(d => {
+                    const opt = document.createElement("option");
+                    opt.value = d.DistrictID;
+                    opt.text = d.DistrictName;
+                    select.appendChild(opt);
+                });
             });
+    }
+
+    function loadWards(districtId) {
+        fetch("https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=" + districtId, {
+            method: "GET",
+            headers: { "Token": GHN_TOKEN }
+        })
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById("wardSelect");
+                select.innerHTML = '<option value="">Select ward</option>';
+                data.data.forEach(w => {
+                    const opt = document.createElement("option");
+                    opt.value = w.WardCode;
+                    opt.text = w.WardName;
+                    select.appendChild(opt);
+                });
+            });
+    }
+
+    function formatCurrency(value) {
+        return new Intl.NumberFormat("vi-VN").format(value) + " đ";
+    }
+
+    function updateShippingFee() {
+        const summaryDiv = document.getElementById("summaryData");
+        if (!summaryDiv) return;
+
+        const subtotal = parseFloat(summaryDiv.dataset.subtotal || 0);
+        const discount = parseFloat(summaryDiv.dataset.discount || 0);
+
+        const districtId = document.getElementById("districtSelect")?.value;
+        const wardCode = document.getElementById("wardSelect")?.value;
+        console.log("Sending to backend:", districtId, wardCode);
+
+        if (!districtId || !wardCode) return;
+
+        fetch("${pageContext.request.contextPath}/calculateShippingFee", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                districtId: parseInt(districtId),
+                wardCode: wardCode
+            })
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Fetch failed");
+                return res.json();
+            })
+            .then(data => {
+                const fee = data.fee;
+                document.getElementById("shippingFeeDisplay").innerText = formatCurrency(fee);
+                const total = Math.round((subtotal - discount + fee) * 100) / 100;
+                document.getElementById("totalCostDisplay").innerText = formatCurrency(total);
+            })
+            .catch(err => {
+                console.error("Shipping fee fetch error:", err);
+                document.getElementById("shippingFeeDisplay").innerText = "Lỗi";
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        loadProvinces();
+        document.getElementById("provinceSelect").addEventListener("change", function () {
+            loadDistricts(this.value);
         });
-
-        function loadProvinces() {
-            fetch("https://online-gateway.ghn.vn/shiip/public-api/master-data/province", {
-                method: "GET",
-                headers: {
-                    "Token": GHN_TOKEN
-                }
-            })
-                .then(res => res.json())
-                .then(data => {
-                    const select = document.getElementById("provinceSelect");
-                    select.innerHTML = '<option value="">Select province</option>';
-                    data.data.forEach(p => {
-                        const opt = document.createElement("option");
-                        opt.value = p.ProvinceID;
-                        opt.text = p.ProvinceName;
-                        select.appendChild(opt);
-                    });
-                })
-                .catch(err => console.error("Load province error:", err));
-        }
-
-        function loadDistricts(provinceId) {
-            fetch("https://online-gateway.ghn.vn/shiip/public-api/master-data/district", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Token": GHN_TOKEN
-                },
-                body: JSON.stringify({ province_id: parseInt(provinceId) })
-            })
-                .then(res => res.json())
-                .then(data => {
-                    const select = document.getElementById("districtSelect");
-                    select.innerHTML = '<option value="">Select district</option>';
-                    data.data.forEach(d => {
-                        const opt = document.createElement("option");
-                        opt.value = d.DistrictID;
-                        opt.text = d.DistrictName;
-                        select.appendChild(opt);
-                    });
-                })
-                .catch(err => console.error("Load district error:", err));
-        }
-
-        function loadWards(districtId) {
-            fetch("https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=" + districtId, {
-                method: "GET",
-                headers: {
-                    "Token": GHN_TOKEN
-                }
-            })
-                .then(res => res.json())
-                .then(data => {
-                    const select = document.getElementById("wardSelect");
-                    select.innerHTML = '<option value="">Select ward</option>';
-                    data.data.forEach(w => {
-                        const opt = document.createElement("option");
-                        opt.value = w.WardCode;
-                        opt.text = w.WardName;
-                        select.appendChild(opt);
-                    });
-                })
-                .catch(err => console.error("Load ward error:", err));
-        }
-    </script>
+        document.getElementById("districtSelect").addEventListener("change", function () {
+            loadWards(this.value);
+        });
+        document.getElementById("wardSelect").addEventListener("change", updateShippingFee);
+    });
+</script>
 
 
-<%--    <form action="orderCreate" method="post">--%>
-<%--        <div class="row">--%>
-<%--            <div class="col-md-8">--%>
-<%--                <h4>Delivery Information</h4>--%>
-<%--                <div class="mb-3">--%>
-<%--                    <label class="form-label">Full Name</label>--%>
-<%--                    <input type="text" name="receiveName" class="form-control" value="${sessionScope.receiveName}" readonly>--%>
-<%--                </div>--%>
-<%--                <div class="mb-3">--%>
-<%--                    <label class="form-label">Phone</label>--%>
-<%--                    <input type="text" name="receivePhone" class="form-control" value="${sessionScope.receivePhone}" readonly>--%>
-<%--                </div>--%>
-<%--                <div class="mb-3">--%>
-<%--                    <label class="form-label">Detail Address</label>--%>
-<%--                    <input type="text" name="receiveAddress" class="form-control" value="${sessionScope.receiveAddress}" readonly>--%>
-<%--                </div>--%>
-<%--                <div class="mb-3">--%>
-<%--                    <label class="form-label">Note</label>--%>
-<%--                    <textarea name="note" class="form-control note-area" readonly>${sessionScope.note}</textarea>--%>
-<%--                </div>--%>
-<%--                <div class="mb-3">--%>
-<%--                    <label class="form-label">Shipping Method</label>--%>
-<%--                    <input type="text" name="shippingMethod" class="form-control" value="${sessionScope.shippingMethod}" readonly>--%>
-<%--                </div>--%>
 
-<%--                <div class="row mb-3">--%>
-<%--                    <div class="col">--%>
-<%--                        <label class="form-label">City</label>--%>
-<%--                        <select class="form-select" disabled><option>Select city</option></select>--%>
-<%--                    </div>--%>
-<%--                    <div class="col">--%>
-<%--                        <label class="form-label">District</label>--%>
-<%--                        <select class="form-select" disabled><option>Select district</option></select>--%>
-<%--                    </div>--%>
-<%--                    <div class="col">--%>
-<%--                        <label class="form-label">Province</label>--%>
-<%--                        <select class="form-select" disabled><option>Select province</option></select>--%>
-<%--                    </div>--%>
-<%--                </div>--%>
-<%--            </div>--%>
-
-<%--            <div class="col-md-4">--%>
-<%--                <div class="bg-light p-4 rounded">--%>
-<%--                    <h4>Summary</h4>--%>
-<%--                    <p><strong>Subtotal:</strong> ${sessionScope.subtotal} đ</p>--%>
-<%--                    <p><strong>Discount:</strong> ${sessionScope.discount} đ</p>--%>
-<%--                    <p class="total-area">Total Cost: ${sessionScope.total} đ</p>--%>
-
-<%--                    <hr class="my-4">--%>
-<%--                    <button type="submit" class="btn btn-primary w-100">Confirm Order</button>--%>
-<%--                </div>--%>
-<%--            </div>--%>
-<%--        </div>--%>
-<%--    </form>--%>
 </div>
 
 <!-- Footer -->
-<footer>
-    <div class="container">
-        <p class="mb-0">&copy; 2025 MyShop. All rights reserved.</p>
-    </div>
-</footer>
+<jsp:include page="footer.jsp"/>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

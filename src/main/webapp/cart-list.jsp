@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
     <title>Shopping Cart</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
         .old-price {
             text-decoration: line-through;
@@ -32,7 +32,8 @@
 </head>
 <body>
 
-<section class="h-100 h-custom bg-light">
+<jsp:include page="header.jsp"/>
+    <section class="h-100 h-custom bg-light">
     <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center h-100">
             <div class="col-12">
@@ -123,7 +124,7 @@
                                         <h5><strong>€ ${total}</strong></h5>
                                     </div>
 
-                                    <form action="orderConfirm" method="GET">
+                                    <form action="orderConfirm" method="get">
                                         <button class="btn btn-dark btn-block w-100" type="submit">Place order</button>
                                     </form>
                                 </div>
@@ -140,4 +141,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+<jsp:include page="footer.jsp"/>
+
 </html>

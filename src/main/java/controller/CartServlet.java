@@ -88,7 +88,7 @@ public class CartServlet extends HttpServlet {
         Cart cart = cartService.getCartByUserId(userId);
         cartService.addCartItem(cart.getCartId(), productId, quantity);
 
-        response.sendRedirect("/cartView");
+        response.setStatus(HttpServletResponse.SC_OK); // trả thành công mà không redirect
     }
 
     private void handleUpdateCartItem(HttpServletRequest request, HttpServletResponse response) throws IOException {
