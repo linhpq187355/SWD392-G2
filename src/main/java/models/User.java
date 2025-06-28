@@ -1,39 +1,29 @@
 package models;
 
-import java.time.LocalDateTime;
-
 public class User {
-    private int userId;
+    private String id;
     private String email;
+    private String name;
+    private String picture;
     private String password;
-    public String firstName;
-    public String lastName;
-    private int roleId;
-    private String googleId;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
-    public User() {
-    }
 
-    public User(int userId, String email, String password, String firstName, String lastName, int roleId, String googleId, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.userId = userId;
+    public User() {}
+
+    public User(String id, String email, String name, String picture, String password) {
+        this.id = id;
         this.email = email;
+        this.name = name;
+        this.picture = picture;
         this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.roleId = roleId;
-        this.googleId = googleId;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
-    public int getUserId() {
-        return userId;
+    public String getId() {
+        return id;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getEmail() {
@@ -44,6 +34,22 @@ public class User {
         this.email = email;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -52,51 +58,13 @@ public class User {
         this.password = password;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public int getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(int roleId) {
-        this.roleId = roleId;
-    }
-
-    public String getGoogleId() {
-        return googleId;
-    }
-
-    public void setGoogleId(String googleId) {
-        this.googleId = googleId;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    @Override
+    public String toString() {
+        return "GoogleUser{" +
+                "id='" + id + '\'' +
+                ", email='" + email + '\'' +
+                ", name='" + name + '\'' +
+                ", picture='" + picture + '\'' +
+                '}';
     }
 }

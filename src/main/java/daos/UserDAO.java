@@ -4,8 +4,7 @@ import models.User;
 
 import java.sql.*;
 
-public class UserDAO extends DBContext {
-    // register account
+public class UserDAO extends  DBContext {
 
     public boolean loginUser(User user) {
         String sql = "SELECT * FROM [User] WHERE email = ? AND password = ?";
@@ -22,4 +21,3 @@ public class UserDAO extends DBContext {
     }
 
 }
-

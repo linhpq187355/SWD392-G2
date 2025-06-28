@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class UserService {
-    static UserValidator userValidator = new UserValidator();
     private static final Map<String, String> users = new HashMap<>();
     static {
         users.put("test@gmail.com", "123456");
