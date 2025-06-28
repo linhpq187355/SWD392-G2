@@ -2,7 +2,6 @@ package services;
 
 import daos.UserDAO;
 import models.User;
-import validators.UserValidator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,13 +19,6 @@ public class UserService {
     }
         private final UserDAO userDAO = new UserDAO();
 
-        public boolean register(User user) {
-            if(userValidator.isValid(user)) {
-                return false;
-            }
-
-            return userDAO.registerUser(user);
-        }
 
         public boolean login(User user) {
             return userDAO.loginUser(user);

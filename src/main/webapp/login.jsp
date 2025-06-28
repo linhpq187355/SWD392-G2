@@ -1,10 +1,10 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Modern Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
     <style>
         * {
             box-sizing: border-box;
@@ -13,8 +13,8 @@
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #e0f7fa, #f1f8ff);
             height: 100vh;
             display: flex;
             justify-content: center;
@@ -26,52 +26,40 @@
             background: #ffffff;
             padding: 2.5rem 2rem;
             border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
         }
 
-        .login-form h2 {
+        .login-container h2 {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.8rem;
+            font-size: 1.8rem;
             color: #333;
         }
 
-        .login-form input[type="email"],
-        .login-form input[type="password"] {
+        .login-form input {
             width: 100%;
-            padding: 0.75rem;
-            margin-bottom: 1.2rem;
+            padding: 0.9rem;
+            margin-bottom: 1.3rem;
             border: 1px solid #ccc;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 1rem;
             transition: border-color 0.3s ease;
         }
 
         .login-form input:focus {
-            border-color: #74ebd5;
+            border-color: #00acc1;
             outline: none;
-        }
-
-        .actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .actions a {
-            text-decoration: none;
-            color: #508bfc;
         }
 
         .btn-login {
             width: 100%;
-            padding: 0.75rem;
-            background-color: #508bfc;
+            padding: 0.9rem;
+            background-color: #008cba;
             color: white;
-            font-size: 1rem;
+            font-size: 1.05rem;
+            font-weight: 600;
             border: none;
             border-radius: 12px;
             cursor: pointer;
@@ -79,70 +67,55 @@
         }
 
         .btn-login:hover {
-            background-color: #3a6edb;
-        }
-
-        .social-login {
-            text-align: center;
-            margin-top: 2rem;
+            background-color: #007bb5;
         }
 
         .google-button {
+            display: block;
+            margin: 1.5rem auto 0;
             background-color: #dd4b39;
             color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 8px;
-            font-size: 0.95rem;
+            padding: 0.75rem 1.2rem;
+            border-radius: 10px;
+            font-size: 1rem;
             font-weight: 600;
-            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
             transition: background-color 0.3s ease, transform 0.2s;
         }
 
         .google-button:hover {
             background-color: #c23321;
-            transform: scale(1.05);
+            transform: scale(1.03);
         }
 
-        .google-button:focus {
-            outline: none;
-        }
-
-        a.google-link {
-            text-decoration: none;
+        .error-msg {
+            color: red;
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.95rem;
         }
     </style>
 </head>
 <body>
 <div class="login-container">
-    <form method="post" action="${pageContext.request.contextPath}/login" autocomplete="off">
-        <h2>Login</h2>
+    <form method="post" action="${pageContext.request.contextPath}/login" class="login-form">
+        <h2>Welcome Back</h2>
 
-        <input type="email" id="email" name="email" placeholder="Enter your email" required AUTOCOMPLETE="OFF" />
-        <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="OFF" />
-
-        <div class="actions">
-            <label><input type="checkbox" /> Remember me</label>
-            <a href="#">Forgot password?</a>
-        </div>
-
+        <input type="email" name="email" placeholder="Email address" required />
+        <input type="password" name="password" placeholder="Password" required />
         <button type="submit" class="btn-login">Sign In</button>
 
-        <div class="social-login">
-            <% String error = (String) request.getAttribute("error"); %>
-            <% if (error != null) { %>
-            <p style="color: red; text-align: center; margin-bottom: 1rem;"><%= error %></p>
-            <% } %>
+        <% String error = (String) request.getAttribute("error"); %>
+        <% if (error != null) { %>
+        <div class="error-msg"><%= error %></div>
+        <% } %>
 
-            <a href="https://accounts.google.com/o/oauth2/auth?scope=openid%20email%20profile
-&redirect_uri=http://localhost:8080/SWD392-G2/login-google
-&response_type=code
-&client_id=749837398859-74d9j1f6b6cl0ign9bah52igbe8s2q10.apps.googleusercontent.com
-&approval_prompt=force
-&access_type=offline" class="google-link">
-                <div class="google-button">Login with Google</div>
-            </a>
-        </div>
-
+        <a href="https://accounts.google.com/o/oauth2/auth?scope=openid%20email%20profile&redirect_uri=http://localhost:8080/SWD392_G2_war_exploded/login-google&response_type=code&client_id=749837398859-0v26hcmekbpe0t9b3sgs7ce15pmfqufr.apps.googleusercontent.com&approval_prompt=force&access_type=offline"
+           class="google-button">
+            Sign in with Google
+        </a>
+    </form>
+</div>
 </body>
 </html>

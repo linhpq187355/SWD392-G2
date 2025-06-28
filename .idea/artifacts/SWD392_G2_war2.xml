@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="SWD392-G2:war2">
+    <output-path>$PROJECT_DIR$/out/artifacts/SWD392_G2_war2</output-path>
+    <root id="archive" name="SWD392-G2_war.war">
+      <element id="artifact" artifact-name="SWD392-G2:war" />
+    </root>
+  </artifact>
+</component>
