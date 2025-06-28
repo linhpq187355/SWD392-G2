@@ -1,29 +1,35 @@
 package models;
 
 public class User {
-    private String id;
+    private int userId;
     private String email;
-    private String name;
-    private String picture;
     private String password;
+    private String phone;
+    private String gender;
+    private String fullName;
+    private int roleId;
+    private String googleId;
 
-
-    public User() {}
-
-    public User(String id, String email, String name, String picture, String password) {
-        this.id = id;
+    public User(int userId, String email, String password, String phone, String gender, String fullName, int roleId, String googleId) {
+        this.userId = userId;
         this.email = email;
-        this.name = name;
-        this.picture = picture;
         this.password = password;
+        this.phone = phone;
+        this.gender = gender;
+        this.fullName = fullName;
+        this.roleId = roleId;
+        this.googleId = googleId;
     }
 
-    public String getId() {
-        return id;
+    public User() {
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getEmail() {
@@ -34,22 +40,6 @@ public class User {
         this.email = email;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPicture() {
-        return picture;
-    }
-
-    public void setPicture(String picture) {
-        this.picture = picture;
-    }
-
     public String getPassword() {
         return password;
     }
@@ -58,13 +48,43 @@ public class User {
         this.password = password;
     }
 
-    @Override
-    public String toString() {
-        return "GoogleUser{" +
-                "id='" + id + '\'' +
-                ", email='" + email + '\'' +
-                ", name='" + name + '\'' +
-                ", picture='" + picture + '\'' +
-                '}';
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public int getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(int roleId) {
+        this.roleId = roleId;
+    }
+
+    public String getGoogleId() {
+        return googleId;
+    }
+
+    public void setGoogleId(String googleId) {
+        this.googleId = googleId;
     }
 }
