@@ -1,141 +1,152 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
     <title>Register Account</title>
-    <link rel="stylesheet" href="register.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-<style>
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
 
-    body {
-        font-family: 'Poppins', sans-serif;
-        background: linear-gradient(to right, #74ebd5, #ACB6E5);
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+        .register-box {
+            background: white;
+            padding: 2.5rem 3rem;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            width: 500px;
+            max-width: 90%;
+        }
 
-    .register-container {
-        background: white;
-        padding: 2.5rem;
-        border-radius: 20px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-        width: 100%;
-        max-width: 600px;
-    }
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #1a73e8;
+        }
 
-    .register-form h2 {
-        text-align: center;
-        margin-bottom: 1.8rem;
-        color: #333;
-    }
+        .form-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
 
-    .input-group {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1.2rem;
-    }
+        .form-group input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
 
-    .input-group input,
-    .input-group select {
-        flex: 1;
-        padding: 0.75rem;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        font-size: 1rem;
-    }
+        .single-input {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
 
-    .input-group input:focus,
-    .input-group select:focus {
-        border-color: #508bfc;
-        outline: none;
-    }
+        .btn-register {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 0.8rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
 
-    .btn-register {
-        width: 100%;
-        padding: 0.75rem;
-        background-color: #508bfc;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        font-size: 1rem;
-        margin-top: 0.8rem;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
+        .btn-register:hover {
+            background-color: #388e3c;
+        }
 
-    .btn-register:hover {
-        background-color: #3a6edb;
-    }
+        .bottom-links {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+        }
 
-    .divider {
-        text-align: center;
-        margin: 1rem 0;
-        color: #888;
-        font-size: 0.9rem;
-    }
+        .bottom-links a {
+            color: #1a73e8;
+            text-decoration: none;
+            font-weight: 600;
+        }
 
-    .btn-google {
-        width: 100%;
-        padding: 0.7rem;
-        background-color: #dd4b39;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        font-weight: bold;
-        cursor: pointer;
-    }
+        .google-button {
+            display: block;
+            text-align: center;
+            background-color: #dd4b39;
+            color: white;
+            padding: 0.7rem;
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            margin-top: 1rem;
+            transition: background-color 0.3s ease;
+        }
 
-    .login-link {
-        font-size: 0.9rem;
-        text-align: center;
-        margin-top: 0.5rem;
-    }
+        .google-button:hover {
+            background-color: #c23321;
+        }
 
-    .login-link a {
-        color: #508bfc;
-        text-decoration: none;
-    }
+        .message {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+        }
 
-</style>
+        .message.error {
+            color: red;
+        }
+
+        .message.success {
+            color: green;
+        }
+    </style>
 </head>
 <body>
-<div class="register-container">
-    <form class="register-form">
-        <h2>Register Account</h2>
-        <div class="input-group">
-            <input type="email" placeholder="Email" required />
+<div class="register-box">
+    <h2>Register account</h2>
+    <form action="${pageContext.request.contextPath}/user?action=register" method="post">
+        <div class="form-group">
+            <input type="text" name="firstName" placeholder="Name" required>
+            <input type="text" name="lastName" placeholder="Last Name" required>
         </div>
-
-        <div class="input-group">
-            <input type="password" placeholder="Password" required />
-            <input type="password" placeholder="Confirm Password" required />
+        <div class="form-group">
+            <input type="email" name="email" placeholder="Email" required>
         </div>
-
-        <p class="login-link">Already have an account? <a href="login.jsp">Login</a></p>
-
-        <button type="submit" class="btn-register">Register Now</button>
-
-        <div class="divider">or</div>
-        <div class="social-login">
-            
-            <a href="https://accounts.google.com/o/oauth2/auth?scope=openid%20email%20profile
-&redirect_uri=http://localhost:8080/SWD392-G2/login-google
-&response_type=code
-&client_id=749837398859-74d9j1f6b6cl0ign9bah52igbe8s2q10.apps.googleusercontent.com
-&approval_prompt=force
-&access_type=offline" class="google-link">
-                <div class="google-button">Register with Google</div>
-            </a>
+        <div class="form-group">
+            <input type="password" name="password" placeholder="********" required>
+            <input type="password" name="confirmPassword" placeholder="********" required>
         </div>
+        <button type="submit" class="btn-register">Register now</button>
     </form>
+
+    <div class="bottom-links">
+        Already have an account? <a href="login.jsp">Login</a>
+    </div>
+
+    <a href="https://accounts.google.com/o/oauth2/auth?scope=openid%20email%20profile&redirect_uri=http://localhost:8080/SWD392_G2_war_exploded/user?action=google&response_type=code&client_id=749837398859-0v26hcmekbpe0t9b3sgs7ce15pmfqufr.apps.googleusercontent.com&approval_prompt=force&access_type=offline" class="google-button">
+        Or Login with Google
+    </a>
+
+    <c:if test="${not empty error}">
+        <div class="message error">${error}</div>
+    </c:if>
+    <c:if test="${not empty success}">
+        <div class="message success">${success}</div>
+    </c:if>
 </div>
 </body>
 </html>

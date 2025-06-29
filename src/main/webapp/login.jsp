@@ -1,4 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -99,22 +102,27 @@
 </head>
 <body>
 <div class="login-container">
-    <form method="post" action="${pageContext.request.contextPath}/login" class="login-form">
-        <h2>Welcome Back</h2>
+    <form method="post" action="${pageContext.request.contextPath}/user?action=login" class="login-form">
+        <h2>Welcome </h2>
 
         <input type="email" name="email" placeholder="Email address" required />
         <input type="password" name="password" placeholder="Password" required />
         <button type="submit" class="btn-login">Sign In</button>
 
-        <% String error = (String) request.getAttribute("error"); %>
-        <% if (error != null) { %>
-        <div class="error-msg"><%= error %></div>
-        <% } %>
+        <c:if test="${not empty error}">
+            <div class="error-msg">${error}</div>
+        </c:if>
 
-        <a href="https://accounts.google.com/o/oauth2/auth?scope=openid%20email%20profile&redirect_uri=http://localhost:8080/SWD392_G2_war_exploded/login-google&response_type=code&client_id=749837398859-0v26hcmekbpe0t9b3sgs7ce15pmfqufr.apps.googleusercontent.com&approval_prompt=force&access_type=offline"
+
+        <a href="https://accounts.google.com/o/oauth2/auth?scope=openid%20email%20profile
+&redirect_uri=http://localhost:8080/SWD392_G2_war_exploded/user?action=google
+&response_type=code
+&client_id=749837398859-0v26hcmekbpe0t9b3sgs7ce15pmfqufr.apps.googleusercontent.com
+&approval_prompt=force&access_type=offline"
            class="google-button">
             Sign in with Google
         </a>
+
     </form>
 </div>
 </body>

@@ -9,6 +9,7 @@ public class User {
     private String fullName;
     private int roleId;
     private String googleId;
+    private Address address;
 
     public User(int userId, String email, String password, String phone, String gender, String fullName, int roleId, String googleId) {
         this.userId = userId;
@@ -20,8 +21,27 @@ public class User {
         this.roleId = roleId;
         this.googleId = googleId;
     }
+    public User(int userId, String email, String password, String phone, String gender, String fullName, int roleId, String googleId, Address address) {
+        this.userId = userId;
+        this.email = email;
+        this.password = password;
+        this.phone = phone;
+        this.gender = gender;
+        this.fullName = fullName;
+        this.roleId = roleId;
+        this.googleId = googleId;
+        this.address =address;
+    }
 
     public User() {
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
     public int getUserId() {
