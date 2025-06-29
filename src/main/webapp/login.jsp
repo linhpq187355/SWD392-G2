@@ -102,7 +102,7 @@
 </head>
 <body>
 <div class="login-container">
-    <form method="post" action="${pageContext.request.contextPath}/user?action=login" class="login-form">
+    <form method="post" action="${pageContext.request.contextPath}/login" class="login-form">
         <h2>Welcome </h2>
 
         <input type="email" name="email" placeholder="Email address" required />
@@ -115,7 +115,7 @@
 
 
         <a href="https://accounts.google.com/o/oauth2/auth?scope=openid%20email%20profile
-&redirect_uri=http://localhost:8080/SWD392_G2_war_exploded/user?action=google
+&redirect_uri=http://localhost:8080/SWD392_G2_war_exploded/google-login
 &response_type=code
 &client_id=749837398859-0v26hcmekbpe0t9b3sgs7ce15pmfqufr.apps.googleusercontent.com
 &approval_prompt=force&access_type=offline"

@@ -118,7 +118,7 @@
 <body>
 <div class="register-box">
     <h2>Register account</h2>
-    <form action="${pageContext.request.contextPath}/user?action=register" method="post">
+    <form action="${pageContext.request.contextPath}/register" method="post">
         <div class="form-group">
             <input type="text" name="firstName" placeholder="Name" required>
             <input type="text" name="lastName" placeholder="Last Name" required>
