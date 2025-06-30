@@ -1,5 +1,7 @@
 package models;
 
+import java.time.LocalDateTime;
+
 public class User {
     private int userId;
     private String email;
@@ -10,8 +12,14 @@ public class User {
     private int roleId;
     private String googleId;
     private Address address;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    public User(int userId, String email, String password, String phone, String gender, String fullName, int roleId, String googleId) {
+    public User() {}
+
+    public User(int userId, String email, String password, String phone, String gender,
+                String fullName, int roleId, String googleId,
+                Address address, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.userId = userId;
         this.email = email;
         this.password = password;
@@ -20,28 +28,9 @@ public class User {
         this.fullName = fullName;
         this.roleId = roleId;
         this.googleId = googleId;
-    }
-    public User(int userId, String email, String password, String phone, String gender, String fullName, int roleId, String googleId, Address address) {
-        this.userId = userId;
-        this.email = email;
-        this.password = password;
-        this.phone = phone;
-        this.gender = gender;
-        this.fullName = fullName;
-        this.roleId = roleId;
-        this.googleId = googleId;
-        this.address =address;
-    }
-
-    public User() {
-    }
-
-    public Address getAddress() {
-        return address;
-    }
-
-    public void setAddress(Address address) {
         this.address = address;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public int getUserId() {
@@ -106,5 +95,29 @@ public class User {
 
     public void setGoogleId(String googleId) {
         this.googleId = googleId;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

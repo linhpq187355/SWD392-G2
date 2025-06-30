@@ -1,11 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Modern Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
     <style>
@@ -56,6 +56,19 @@
             outline: none;
         }
 
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .actions a {
+            text-decoration: none;
+            color: #508bfc;
+        }
+
         .btn-login {
             width: 100%;
             padding: 0.9rem;
@@ -73,23 +86,28 @@
             background-color: #007bb5;
         }
 
+        .social-login {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
         .google-button {
-            display: block;
-            margin: 1.5rem auto 0;
+            display: inline-block;
             background-color: #dd4b39;
             color: white;
+            border: none;
             padding: 0.75rem 1.2rem;
             border-radius: 10px;
             font-size: 1rem;
             font-weight: 600;
             text-decoration: none;
-            text-align: center;
+            cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s;
         }
 
         .google-button:hover {
             background-color: #c23321;
-            transform: scale(1.03);
+            transform: scale(1.05);
         }
 
         .error-msg {
@@ -102,27 +120,32 @@
 </head>
 <body>
 <div class="login-container">
-    <form method="post" action="${pageContext.request.contextPath}/login" class="login-form">
-        <h2>Welcome </h2>
+    <form method="post" action="${pageContext.request.contextPath}/login" class="login-form" autocomplete="off">
+        <h2>Welcome</h2>
 
         <input type="email" name="email" placeholder="Email address" required />
         <input type="password" name="password" placeholder="Password" required />
+
+        <div class="actions">
+            <label><input type="checkbox" /> Remember me</label>
+            <a href="#">Forgot password?</a>
+        </div>
+
         <button type="submit" class="btn-login">Sign In</button>
 
         <c:if test="${not empty error}">
             <div class="error-msg">${error}</div>
         </c:if>
 
-
-        <a href="https://accounts.google.com/o/oauth2/auth?scope=openid%20email%20profile
+        <div class="social-login">
+            <a href="https://accounts.google.com/o/oauth2/auth?scope=openid%20email%20profile
 &redirect_uri=http://localhost:8080/SWD392_G2_war_exploded/google-login
 &response_type=code
 &client_id=749837398859-0v26hcmekbpe0t9b3sgs7ce15pmfqufr.apps.googleusercontent.com
-&approval_prompt=force&access_type=offline"
-           class="google-button">
-            Sign in with Google
-        </a>
-
+&approval_prompt=force&access_type=offline" class="google-button">
+                Sign in with Google
+            </a>
+        </div>
     </form>
 </div>
 </body>

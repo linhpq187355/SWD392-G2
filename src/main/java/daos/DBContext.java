@@ -9,9 +9,9 @@ public class DBContext {
     public DBContext()
     {
         try {
-            String url = "jdbc:sqlserver://localhost:1433;databaseName=OnlineShopDBv3 ;encrypt=true;trustServerCertificate=true;";
+            String url = "jdbc:sqlserver://localhost:1433;databaseName=OnlineShopDB;trustServerCertificate=true";
             String username = "sa";
-            String password = "1234";
+            String password = "123";
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 
             connection = DriverManager.getConnection(url, username, password);
