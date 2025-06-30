@@ -1,7 +1,7 @@
 package services;
 
 import daos.OrderDao;
-import daos.ProductDao;
+import daos.ProductDAO;
 import models.Order;
 import models.OrderItemDetail;
 import models.Product;
@@ -16,12 +16,12 @@ public class OrderService {
     private final OrderDao orderDao;
     private final AddressService addressService;
     private final GhnService ghnService;
-    private final ProductDao productDao;
+    private final ProductDAO productDao;
     public OrderService() {
         addressService = new AddressService();
         orderDao = new OrderDao(); // Khởi tạo Dao
         ghnService = new GhnService();
-        productDao = new ProductDao();
+        productDao = new ProductDAO();
     }
 
     // Lấy tất cả đơn hàng
@@ -97,7 +97,7 @@ public class OrderService {
         return false;
     }
 
-    public void updateOrder(Order orderToUpdate, Map<String, Integer> quantities) throws Exception {
+    public void updateOrder(Order orderToUpdate, Map<Integer, Integer> quantities) throws Exception {
         // 1. Validate Business Rules
         validateBusinessRules(orderToUpdate, quantities);
 
@@ -133,12 +133,12 @@ public class OrderService {
         }
     }
 
-    private void validateBusinessRules(Order order, Map<String, Integer> quantities) throws ValidationException {
+    private void validateBusinessRules(Order order, Map<Integer, Integer> quantities) throws ValidationException {
         List<String> errors = new ArrayList<>();
 
         if (quantities != null) {
-            for (Map.Entry<String, Integer> item : quantities.entrySet()) {
-                String productId = item.getKey();
+            for (Map.Entry<Integer, Integer> item : quantities.entrySet()) {
+                Integer productId = item.getKey();
                 int requestedQuantity = item.getValue();
 
                 Product product = getProduct(productId);
@@ -174,8 +174,8 @@ public class OrderService {
         }
     }
 
-    private Product getProduct(String productId) {
-        return productDao.findProductByCode(productId);
+    private Product getProduct(int productId) {
+        return productDao.getProduct(productId);
     }
 
     private boolean isShippingInfoChanged(Order original, Order updated) {

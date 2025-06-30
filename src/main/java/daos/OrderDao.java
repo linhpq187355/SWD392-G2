@@ -194,17 +194,17 @@ public class OrderDao extends DBContext {
         }
     }
 
-    public boolean updateOrderItemQuantities(String orderId, Map<String, Integer> quantities) throws SQLException {
-        String sql = "UPDATE OrderItem SET quantity = ? WHERE orderId = ? AND productId = ?";
+    public boolean updateOrderItemQuantities(String orderId, Map<Integer, Integer> quantities) throws SQLException {
+        String sql = "UPDATE OrderItem SET quantity = ? WHERE orderId = ? AND id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             connection.setAutoCommit(false); // Bắt đầu transaction
-            for (Map.Entry<String, Integer> entry : quantities.entrySet()) {
-                String productId = entry.getKey();
+            for (Map.Entry<Integer, Integer> entry : quantities.entrySet()) {
+                Integer productId = entry.getKey();
                 int newQuantity = entry.getValue();
 
                 ps.setInt(1, newQuantity);
                 ps.setString(2, orderId);
-                ps.setString(3, productId);
+                ps.setInt(3, productId);
                 ps.addBatch();
             }
             int[] results = ps.executeBatch();

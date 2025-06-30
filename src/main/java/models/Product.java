@@ -48,6 +48,39 @@ public class Product {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public double getOriginalPrice() {
+        return originalPrice;
+    }
+
+    public void setOriginalPrice(double originalPrice) {
+        this.originalPrice = originalPrice;
+    }
+
+    public double getSalePrice() {
+        return salePrice;
+    }
+
+    public void setSalePrice(double salePrice) {
+        this.salePrice = salePrice;
+    }
 
     public int getStock() {
         return stock;
@@ -55,6 +88,14 @@ public class Product {
 
     public void setStock(int stock) {
         this.stock = stock;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public int getCreatedBy() {
@@ -81,28 +122,12 @@ public class Product {
         this.updatedAt = updatedAt;
     }
 
-    public double getOriginalPrice() {
-        return originalPrice;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setOriginalPrice(double originalPrice) {
-        this.originalPrice = originalPrice;
-    }
-
-    public double getSalePrice() {
-        return salePrice;
-    }
-
-    public void setSalePrice(double salePrice) {
-        this.salePrice = salePrice;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public List<String> getImages() {
@@ -113,18 +138,11 @@ public class Product {
         this.images = images;
     }
 
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
     @Override
     public String toString() {
         return "Product{" +
-                "code='" + code + '\'' +
+                "id=" + id +
+                ", code='" + code + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", originalPrice=" + originalPrice +

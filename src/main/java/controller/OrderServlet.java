@@ -167,10 +167,11 @@ public class OrderServlet extends HttpServlet {
         int districtId = Integer.parseInt(district);
         int wardId = Integer.parseInt(ward);
         // Lấy số lượng sản phẩm mới
-        Map<String, Integer> quantities = new HashMap<>();
+        Map<Integer, Integer> quantities = new HashMap<>();
         request.getParameterMap().forEach((key, value) -> {
             if (key.startsWith("quantity_")) {
-                String productId = key.substring(9);
+                String productIdRaw = key.substring(9);
+                int productId = Integer.parseInt(productIdRaw);
                 try {
                     int quantity = Integer.parseInt(value[0]);
                     quantities.put(productId, quantity);
