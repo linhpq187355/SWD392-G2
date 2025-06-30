@@ -6,30 +6,33 @@ public class User {
     private int userId;
     private String email;
     private String password;
-    private String firstName;
-    private String lastName;
+    private String phone;
+    private String gender;
+    private String fullName;
     private int roleId;
     private String googleId;
+    private Address address;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Constructors
     public User() {}
 
-    public User(int userId, String email, String password, String firstName, String lastName,
-                int roleId, String googleId, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public User(int userId, String email, String password, String phone, String gender,
+                String fullName, int roleId, String googleId,
+                Address address, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.userId = userId;
         this.email = email;
         this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.phone = phone;
+        this.gender = gender;
+        this.fullName = fullName;
         this.roleId = roleId;
         this.googleId = googleId;
+        this.address = address;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    // Getters and Setters
     public int getUserId() {
         return userId;
     }
@@ -54,20 +57,28 @@ public class User {
         this.password = password;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getGender() {
+        return gender;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public int getRoleId() {
@@ -84,6 +95,14 @@ public class User {
 
     public void setGoogleId(String googleId) {
         this.googleId = googleId;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
     public LocalDateTime getCreatedAt() {
