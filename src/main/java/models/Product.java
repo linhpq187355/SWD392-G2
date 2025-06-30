@@ -1,74 +1,53 @@
 package models;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.List;
 
 public class Product {
-    private int productId;
-
-    public int getProductId() {
-        return productId;
-    }
-
-    public void setProductId(int productId) {
-        this.productId = productId;
-    }
-
-    private String productCode;
+    private int id;
+    private String code;
     private String name;
     private String description;
-    private BigDecimal originalPrice; // Đã sửa: giá gốc
-    private BigDecimal salePrice;     // Đã thêm: giá bán
-    private int stock;                // Đã sửa: tồn kho
-    private boolean isActive;         // Đã thêm: trạng thái hoạt động
-    private int createdBy;            // Đã thêm: người tạo
-    private int categoryId;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
-    // Constructors, Getters, and Setters
+    private double originalPrice;
+    private double salePrice;
+    private int stock;
+    private boolean isActive;
+    private int createdBy;
+    private LocalDate createdAt;
+    private LocalDate updatedAt;
+    private Category category;
+    private List<String> images;
 
     public Product() {}
 
-    public String getProductCode() {
-        return productCode;
-    }
-
-    public void setProductCode(String productCode) {
-        this.productCode = productCode;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
+    public Product(int id, String code, String name, String description, int stock, double originalPrice, double salePrice, boolean isActive, int createdBy, LocalDate updatedAt, LocalDate createdAt) {
+        this.id = id;
+        this.code = code;
         this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
         this.description = description;
-    }
-
-    public BigDecimal getOriginalPrice() {
-        return originalPrice;
-    }
-
-    public void setOriginalPrice(BigDecimal originalPrice) {
+        this.stock = stock;
         this.originalPrice = originalPrice;
-    }
-
-    public BigDecimal getSalePrice() {
-        return salePrice;
-    }
-
-    public void setSalePrice(BigDecimal salePrice) {
         this.salePrice = salePrice;
+        this.isActive = isActive;
+        this.createdBy = createdBy;
+        this.updatedAt = updatedAt;
+        this.createdAt = createdAt;
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
 
     public int getStock() {
         return stock;
@@ -76,14 +55,6 @@ public class Product {
 
     public void setStock(int stock) {
         this.stock = stock;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
     }
 
     public int getCreatedBy() {
@@ -94,27 +65,77 @@ public class Product {
         this.createdBy = createdBy;
     }
 
-    public int getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public LocalDateTime getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public LocalDate getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(LocalDate updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public double getOriginalPrice() {
+        return originalPrice;
+    }
+
+    public void setOriginalPrice(double originalPrice) {
+        this.originalPrice = originalPrice;
+    }
+
+    public double getSalePrice() {
+        return salePrice;
+    }
+
+    public void setSalePrice(double salePrice) {
+        this.salePrice = salePrice;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", originalPrice=" + originalPrice +
+                ", salePrice=" + salePrice +
+                ", stock=" + stock +
+                ", isActive=" + isActive +
+                ", createdBy=" + createdBy +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", category=" + category +
+                ", images=" + images +
+                '}';
     }
 }

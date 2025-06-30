@@ -1,13 +1,18 @@
 package services;
 
-import daos.SettingDao;
+
+import daos.SettingDAO;
+import models.Category;
 import models.Setting;
+
 import java.util.List;
 
 public class SettingService {
-    private final SettingDao settingDao;
-
-    public SettingService() {
+    SettingDAO settingDAO = new SettingDAO();
+    public List<Category> getAllCategories() {
+        return settingDAO.getAllCategory();
+    }
+  public SettingService() {
         this.settingDao = new SettingDao();
     }
 
@@ -31,6 +36,5 @@ public class SettingService {
         Setting setting = settingDao.getSettingById(id);
         return setting != null ? setting.getName() : "";
     }
-
 
 }
