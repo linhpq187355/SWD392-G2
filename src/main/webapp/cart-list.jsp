@@ -2,6 +2,8 @@
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,59 +46,119 @@
                             <div class="col-lg-8">
                                 <div class="p-5">
                                     <div class="d-flex justify-content-between align-items-center mb-5">
-                                        <h1 class="fw-bold mb-0">Shopping Cart</h1>
+                                        <h1 class="fw-bold mb-0">Giỏ hàng</h1>
                                     </div>
                                     <hr class="my-4">
 
-                                    <!-- Product Item -->
-                                    <c:forEach var="item" items="${items}" varStatus="status">
-                                        <c:set var="product" value="${products[status.index]}" />
-                                        <div class="row mb-4 align-items-center cart-item border-bottom pb-3">
-                                            <div class="col-md-2">
-                                                <img src="${empty product.img ? '/assets/default-product.jpg' : product.img}" class="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/b113ad06-5ba3-4b01-b2e2-3593d764dc9a/NIKE+QUEST+5.png">
-                                            </div>
-                                            <div class="col-md-3">
-                                                <h6 class="text-muted mb-1">${product.cate}</h6>
-                                                <h6 class="fw-bold mb-1">${product.name}</h6>
-                                                <span class="discount-badge">-10%</span>
-                                            </div>
-                                            <div class="col-md-3 d-flex">
-                                                <form action="cartUpdate" method="post" class="d-flex">
-                                                    <input type="hidden" name="cartItemId" value="${item.cartItemId}">
-                                                    <button type="submit" class="btn btn-outline-secondary btn-sm"
-                                                            onclick="this.parentNode.querySelector('input[type=number]').stepDown()">−</button>
-                                                    <input name="quantity" type="number" min="1" value="${item.quantity}"
-                                                           class="form-control form-control-sm mx-1 text-center" style="width: 60px;">
-                                                    <button type="submit" class="btn btn-outline-secondary btn-sm"
-                                                            onclick="this.parentNode.querySelector('input[type=number]').stepUp()">+</button>
-                                                </form>
-                                            </div>
-                                            <div class="col-md-2 text-end">
-                                                <div class="old-price">${product.price * 0.1}</div>
-                                                <div class="fw-bold">€ ${product.price}</div>
-                                            </div>
-                                            <div class="col-md-2 text-end">
-                                                <form action="cartRemove" method="post">
-                                                    <input type="hidden" name="cartItemId" value="${item.cartItemId}">
-                                                    <button class="remove-btn" type="submit">×</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </c:forEach>
+                                    <c:choose>
 
-                                    <div class="mt-4 text-end">
-                                        <form action="cartClear" method="get">
-                                            <button class="btn btn-danger">Clear Cart</button>
-                                        </form>
-                                    </div>
+                                        <c:when test="${not empty items}">
+                                            <c:forEach var="item" items="${items}" varStatus="status">
+                                                <c:set var="product" value="${products[status.index]}" />
+                                                <c:set var="discountRate" value="${(product.originalPrice - product.salePrice) / product.originalPrice * 100}" />
+
+                                                <div class="row mb-4 align-items-center cart-item border-bottom pb-3">
+                                                    <div class="col-md-2">
+                                                        <img src="${product.images[0]}" alt="${product.name}" class="img-fluid" />
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <h6 class="fw-bold mb-1">${product.name}</h6>
+                        <span class="discount-badge">
+                            -<fmt:formatNumber value="${discountRate}" maxFractionDigits="0"/>%
+                        </span>
+                                                    </div>
+                                                    <div class="col-md-3 d-flex">
+                                                        <form action="cartUpdate" method="post" class="d-flex">
+                                                            <input type="hidden" name="cartItemId" value="${item.cartItemId}">
+                                                            <button type="submit" class="btn btn-outline-secondary btn-sm"
+                                                                    onclick="this.parentNode.querySelector('input[type=number]').stepDown()">−</button>
+                                                            <input name="quantity" type="number" min="1" value="${item.quantity}"
+                                                                   class="form-control form-control-sm mx-1 text-center" style="width: 60px;">
+                                                            <button type="submit" class="btn btn-outline-secondary btn-sm"
+                                                                    onclick="this.parentNode.querySelector('input[type=number]').stepUp()">+</button>
+                                                        </form>
+                                                    </div>
+                                                    <div class="col-md-2 text-end">
+                                                        <div class="text-muted small">
+                                                            <del><fmt:formatNumber value="${product.originalPrice + item.quantity} " type="currency"/></del>
+                                                        </div>
+                                                        <div class="fw-bold"><fmt:formatNumber value="${product.salePrice * item.quantity}" type="currency"/></div>
+                                                    </div>
+                                                    <div class="col-md-2 text-end">
+                                                        <form action="cartRemove" method="post">
+                                                            <input type="hidden" name="cartItemId" value="${item.cartItemId}">
+                                                            <button class="remove-btn" type="submit">×</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </c:forEach>
+                                            <div class="mt-4 text-end">
+                                                <form action="cartClear" method="get">
+                                                    <button class="btn btn-danger">Clear Cart</button>
+                                                </form>
+                                            </div>
+                                        </c:when>
+
+                                        <c:when test="${not empty guestProducts}">
+                                            <c:forEach var="product" items="${guestProducts}">
+                                                <c:set var="quantity" value="${guestQuantities[product.id]}" />
+                                                <c:set var="discountRate" value="${(product.originalPrice - product.salePrice) / product.originalPrice * 100}" />
+
+                                                <div class="row mb-4 align-items-center cart-item border-bottom pb-3">
+                                                    <div class="col-md-2">
+                                                        <img src="${product.images[0]}" alt="${product.name}" class="img-fluid" />
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <h6 class="fw-bold mb-1">${product.name}</h6>
+                                                        <c:if test="${product.originalPrice > product.salePrice}">
+                        <span class="discount-badge">
+                            -<fmt:formatNumber value="${discountRate}" maxFractionDigits="0"/>%
+                        </span>
+                                                        </c:if>
+                                                    </div>
+                                                    <div class="col-md-3 d-flex">
+                                                        <div class="col-md-3 d-flex">
+                                                            <form action="cartUpdateGuest" method="post" class="d-flex">
+                                                                <input type="hidden" name="productId" value="${product.id}" />
+                                                                <button type="submit" name="action" value="decrease" class="btn btn-outline-secondary btn-sm">−</button>
+                                                                <input type="number" value="${quantity}" class="form-control form-control-sm mx-1 text-center" readonly style="width: 60px;" />
+                                                                <button type="submit" name="action" value="increase" class="btn btn-outline-secondary btn-sm">+</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2 text-end">
+                                                        <div class="text-muted small">
+                                                            <del><fmt:formatNumber value="${product.originalPrice * quantity}" type="currency"/></del>
+                                                        </div>
+                                                        <div class="fw-bold"><fmt:formatNumber value="${product.salePrice * quantity}" type="currency"/> </div>
+                                                    </div>
+                                                    <div class="col-md-2 text-end">
+                                                        <form action="cartRemoveGuest" method="post">
+                                                            <input type="hidden" name="productId" value="${product.id}">
+                                                            <button class="remove-btn" type="submit">×</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </c:forEach>
+                                            <div class="mt-4 text-end">
+                                                <form action="cartClearGuest" method="get">
+                                                    <button class="btn btn-danger">Clear Cart</button>
+                                                </form>
+                                            </div>
+                                        </c:when>
+
+                                        <c:otherwise>
+                                            <p class="text-center text-muted">🛒 Giỏ hàng của bạn đang trống.</p>
+                                        </c:otherwise>
+
+                                    </c:choose>
 
 
                                     <hr class="my-4">
 
-                                    <!-- Thêm các sản phẩm khác tương tự nếu cần -->
 
                                     <div class="pt-4">
-                                        <h6><a href="#" class="text-body"><i class="bi bi-arrow-left"></i> Back to shop</a></h6>
+                                        <h6><a href="/homePage" class="text-body"><i class="bi bi-arrow-left"></i> Back to shop</a></h6>
                                     </div>
                                 </div>
                             </div>
@@ -109,19 +171,19 @@
 
                                     <div class="d-flex justify-content-between mb-4">
                                         <h5 class="text-uppercase">Subtotal</h5>
-                                        <h5>€ ${subtotal}</h5>
+                                        <h5> ${originalTotal} đ</h5>
                                     </div>
 
                                     <div class="d-flex justify-content-between mb-4">
                                         <h5 class="text-uppercase text-success">Discount</h5>
-                                        <h5>-€ ${discount}</h5>
+                                        <h5>- ${discount} đ</h5>
                                     </div>
 
                                     <hr class="my-4">
 
                                     <div class="d-flex justify-content-between mb-5">
                                         <h5 class="text-uppercase">Total Price</h5>
-                                        <h5><strong>€ ${total}</strong></h5>
+                                        <h5><strong> ${total} đ</strong></h5>
                                     </div>
 
                                     <form action="orderConfirm" method="get">
@@ -142,5 +204,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 <jsp:include page="footer.jsp"/>
+
 
 </html>

@@ -7,6 +7,8 @@
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><!DOCTYPE html>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
@@ -211,13 +213,21 @@
     <a href="#" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
   </div>
   <div class="row g-4">
-
-    <c:forEach var="p" items="${latestProducts}">
+    <c:forEach var="p" items="${mostSellProduct}">
       <div class="col-lg-3 col-md-4 col-6">
         <div class="card product-card shadow-sm">
-          <span class="badge badge-discount p-2">-20%</span>
-
-          <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/9df370d7-b021-4222-8435-9d275d226c51.png" class="card-img-top product-img" alt="Điện thoại iPhone 13 Pro màu xanh ngọc bích với màn hình sáng">
+          <c:choose>
+            <c:when test="${not empty p.images}">
+              <img src="${p.images[0]}"
+                   class="card-img-top product-img"
+                   alt="${p.name}">
+            </c:when>
+            <c:otherwise>
+              <img src="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/b16739dd-0f2a-4180-90bf-fb9324ea74b8/ZM+VAPOR+16+ELITE+AM+95+SE+FG.png"
+                   class="card-img-top product-img"
+                   alt="${p.name}" />
+            </c:otherwise>
+          </c:choose>
 
           <div class="card-body flex-grow-1">
             <h5 class="card-title">${p.name}</h5>
@@ -225,20 +235,102 @@
 
             <div class="d-flex justify-content-between align-items-center mt-auto">
               <div>
-                <span class="price">${p.price}₫</span>
-                <span class="discount ms-2"><del>${p.price * 1.25}₫</del></span>
+            <span class="price"${p.salePrice}>
+              <fmt:formatNumber value="${p.salePrice}" type="currency" currencySymbol="₫" />
+            </span>
+
+                <c:if test="${p.originalPrice > p.salePrice}">
+              <span class="discount ms-2">
+                <del>
+                  <fmt:formatNumber value="${p.originalPrice}" type="currency" currencySymbol="₫" />
+                </del>
+              </span>
+                </c:if>
               </div>
             </div>
           </div>
 
           <div class="card-footer bg-transparent">
-            <div class="btn-grid">
-              <button class="btn btn-primary btn-add-to-cart" data-product-id="${p.productId}">Thêm vào giỏ</button>
+            <div class="d-flex gap-2">
+              <button class="btn btn-primary w-100 btn-add-to-cart" data-id="${p.id}">
+                Thêm vào giỏ
+              </button>
 
-              <button class="btn btn-success">Mua ngay</button>
+              <form method="post" action="${pageContext.request.contextPath}/cartBuyNow" class="w-100">
+                <input type="hidden" name="productId" value="${p.id}">
+                <input type="hidden" name="quantity" value="1">
+                <button class="btn btn-success w-100" type="submit">Mua ngay</button>
+              </form>
             </div>
+
             <div class="product-detail-link">
-              <a href="product-detail.jsp?id=${p.productId}">Xem chi tiết sản phẩm</a>
+              <a href="product-detail.jsp?code=${p.id}">Xem chi tiết sản phẩm</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </c:forEach>
+
+  </div>
+</section>
+<section class="container mb-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Sản phẩm mới nhất</h2>
+    <a href="#" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
+  </div>
+  <div class="row g-4">
+    <c:forEach var="p" items="${latestProducts}">
+      <div class="col-lg-3 col-md-4 col-6">
+        <div class="card product-card shadow-sm">
+          <c:choose>
+            <c:when test="${not empty p.images}">
+              <img src="${p.images[0]}"
+                   class="card-img-top product-img"
+                   alt="${p.name}">
+            </c:when>
+            <c:otherwise>
+              <img src="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/b16739dd-0f2a-4180-90bf-fb9324ea74b8/ZM+VAPOR+16+ELITE+AM+95+SE+FG.png"
+                   class="card-img-top product-img"
+                   alt="${p.name}" />
+            </c:otherwise>
+          </c:choose>
+
+          <div class="card-body flex-grow-1">
+            <h5 class="card-title">${p.name}</h5>
+            <p class="card-text text-muted">${p.description}</p>
+
+            <div class="d-flex justify-content-between align-items-center mt-auto">
+              <div>
+            <span class="price"${p.salePrice}>
+              <fmt:formatNumber value="${p.salePrice}" type="currency" currencySymbol="₫" />
+            </span>
+
+                <c:if test="${p.originalPrice > p.salePrice}">
+              <span class="discount ms-2">
+                <del>
+                  <fmt:formatNumber value="${p.originalPrice}" type="currency" currencySymbol="₫" />
+                </del>
+              </span>
+                </c:if>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-footer bg-transparent">
+            <div class="d-flex gap-2">
+              <button class="btn btn-primary w-100 btn-add-to-cart" data-id="${p.id}">
+                Thêm vào giỏ
+              </button>
+
+              <form method="post" action="${pageContext.request.contextPath}/cartBuyNow" class="w-100">
+                <input type="hidden" name="productId" value="${p.id}">
+                <input type="hidden" name="quantity" value="1">
+                <button class="btn btn-success w-100" type="submit">Mua ngay</button>
+              </form>
+            </div>
+
+            <div class="product-detail-link">
+              <a href="product-detail.jsp?code=${p.id}">Xem chi tiết sản phẩm</a>
             </div>
           </div>
         </div>
@@ -248,118 +340,6 @@
   </div>
 </section>
 
-<!-- Features Section -->
-<section class="container mb-5 py-4 bg-light rounded-3">
-  <div class="row text-center">
-    <div class="col-md-3 col-6 mb-4">
-      <div class="p-3">
-        <div class="features-icon">
-          <i class="fas fa-shipping-fast"></i>
-        </div>
-        <h5>Miễn phí vận chuyển</h5>
-        <p class="text-muted">Cho đơn hàng từ 500k</p>
-      </div>
-    </div>
-    <div class="col-md-3 col-6 mb-4">
-      <div class="p-3">
-        <div class="features-icon">
-          <i class="fas fa-exchange-alt"></i>
-        </div>
-        <h5>Đổi trả dễ dàng</h5>
-        <p class="text-muted">Trong vòng 7 ngày</p>
-      </div>
-    </div>
-    <div class="col-md-3 col-6 mb-4">
-      <div class="p-3">
-        <div class="features-icon">
-          <i class="fas fa-headset"></i>
-        </div>
-        <h5>Hỗ trợ 24/7</h5>
-        <p class="text-muted">Tư vấn nhiệt tình</p>
-      </div>
-    </div>
-    <div class="col-md-3 col-6 mb-4">
-      <div class="p-3">
-        <div class="features-icon">
-          <i class="fas fa-shield-alt"></i>
-        </div>
-        <h5>Bảo hành chính hãng</h5>
-        <p class="text-muted">Từ 12-24 tháng</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Testimonials -->
-<section class="container mb-5">
-  <h2 class="text-center mb-5">Khách hàng nói gì về chúng tôi</h2>
-  <div class="row">
-    <div class="col-md-4 mb-4">
-      <div class="card h-100 border-0 shadow-sm">
-        <div class="card-body text-center">
-          <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c2589bc1-6c18-4b35-9b3a-32d1b6b5618e.png" class="testimonial-img mb-3" alt="Người đàn ông trung niên mỉm cười, mặc vest đen">
-          <h5 class="card-title">Anh Văn</h5>
-          <div class="text-warning mb-2">
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-          </div>
-          <p class="card-text">"Sản phẩm chất lượng tốt, giao hàng nhanh. Tôi rất hài lòng!"</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4 mb-4">
-      <div class="card h-100 border-0 shadow-sm">
-        <div class="card-body text-center">
-          <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/b416ac97-c874-4cf0-b184-816fd07cb3cc.png" class="testimonial-img mb-3" alt="Cô gái trẻ cười tươi, tóc dài màu đen">
-          <h5 class="card-title">Chị Hương</h5>
-          <div class="text-warning mb-2">
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star-half-alt"></i>
-          </div>
-          <p class="card-text">"Nhân viên tư vấn rất nhiệt tình, sẽ tiếp tục ủng hộ shop."</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4 mb-4">
-      <div class="card h-100 border-0 shadow-sm">
-        <div class="card-body text-center">
-          <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/584433fc-8cb8-4430-9eba-bdf6f15fe6a8.png" class="testimonial-img mb-3" alt="Người đàn ông trẻ đeo kính mỉm cười, áo trắng">
-          <h5 class="card-title">Anh Tuấn</h5>
-          <div class="text-warning mb-2">
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="far fa-star"></i>
-          </div>
-          <p class="card-text">"Giá cả hợp lý, chính sách đổi trả rõ ràng và minh bạch."</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Newsletter -->
-<section class="container mb-5">
-  <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="bg-primary text-white p-5 rounded-3 text-center">
-        <h3 class="mb-3">Đăng ký nhận tin khuyến mãi</h3>
-        <p class="mb-4">Nhận thông báo về các chương trình giảm giá và ưu đãi đặc biệt</p>
-        <div class="input-group mb-3 mx-auto" style="max-width: 500px;">
-          <input type="email" class="form-control" placeholder="Nhập email của bạn">
-          <button class="btn btn-light" type="button">Đăng ký</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- Footer -->
 <jsp:include page="footer.jsp"/>
@@ -369,7 +349,7 @@
   document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.btn-add-to-cart').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        const productId = this.getAttribute('data-product-id');
+        const id = this.getAttribute('data-id');
 
         fetch('${pageContext.request.contextPath}/cartAdd', {
           method: 'POST',
@@ -377,7 +357,7 @@
             'Content-Type': 'application/x-www-form-urlencoded'
           },
           body: new URLSearchParams({
-            productId: productId,
+            productId: id,
             quantity: 1
           })
         })

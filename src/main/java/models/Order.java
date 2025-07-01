@@ -3,58 +3,59 @@ package models;
 import java.time.LocalDateTime;
 
 public class Order {
-    private int orderId;
-    private int userId;
-    private String status;
+    private String orderId;
+    private Integer userId; // nullable cho guest
+    private int statusId;
     private String receiveName;
     private String receivePhone;
     private String receiveAddress;
+    private String receiveEmail;
     private String shippingMethod;
     private String note;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Constructors
-    public Order() {}
-
-    public Order(int orderId, int userId, String status, String receiveName, String receivePhone,
-                 String receiveAddress, String shippingMethod, String note,
-                 LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.orderId = orderId;
-        this.userId = userId;
-        this.status = status;
-        this.receiveName = receiveName;
-        this.receivePhone = receivePhone;
-        this.receiveAddress = receiveAddress;
-        this.shippingMethod = shippingMethod;
-        this.note = note;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+    public Order() {
     }
 
-    // Getters and Setters
-    public int getOrderId() {
+    public Order(LocalDateTime updatedAt, LocalDateTime createdAt, String note, String shippingMethod, String receiveEmail, String receiveAddress, String receivePhone, String receiveName, int statusId, Integer userId, String orderId) {
+        this.updatedAt = updatedAt;
+        this.createdAt = createdAt;
+        this.note = note;
+        this.shippingMethod = shippingMethod;
+        this.receiveEmail = receiveEmail;
+        this.receiveAddress = receiveAddress;
+        this.receivePhone = receivePhone;
+        this.receiveName = receiveName;
+        this.statusId = statusId;
+        this.userId = userId;
+        this.orderId = orderId;
+    }
+// Getters and Setters
+
+
+    public String getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(int orderId) {
+    public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
 
-    public int getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    public String getStatus() {
-        return status;
+    public int getStatusId() {
+        return statusId;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setStatusId(int statusId) {
+        this.statusId = statusId;
     }
 
     public String getReceiveName() {
@@ -79,6 +80,14 @@ public class Order {
 
     public void setReceiveAddress(String receiveAddress) {
         this.receiveAddress = receiveAddress;
+    }
+
+    public String getReceiveEmail() {
+        return receiveEmail;
+    }
+
+    public void setReceiveEmail(String receiveEmail) {
+        this.receiveEmail = receiveEmail;
     }
 
     public String getShippingMethod() {

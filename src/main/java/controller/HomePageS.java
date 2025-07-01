@@ -7,9 +7,11 @@ import models.Product;
 import services.ProductService;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@WebServlet("/HomePage")
+@WebServlet("/homePage")
 public class HomePageS extends HttpServlet {
     private ProductService productService;
 
@@ -21,7 +23,17 @@ public class HomePageS extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<Product> latestProducts = productService.getLatestProducts(); // gọi service
+        List<Product> latestProducts = productService.getLatestProductsWithImages(); // gọi service
+        List<Product> mostSellProduct = productService.getMostSellProductWithImages(); // gọi service
+
+        HttpSession session = request.getSession();
+
+        // Nếu chưa có cart thì tạo mới cho session
+        if (session.getAttribute("guestCart") == null && session.getAttribute("user") == null) {
+            Map<Integer, Integer> guestCart = new HashMap<>(); // Map<productId, quantity>
+            session.setAttribute("guestCart", guestCart);
+        }
+        request.setAttribute("mostSellProduct", mostSellProduct); // đẩy lên JSP
 
         request.setAttribute("latestProducts", latestProducts); // đẩy lên JSP
         request.getRequestDispatcher("home-page.jsp").forward(request, response);

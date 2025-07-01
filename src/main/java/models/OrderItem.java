@@ -2,23 +2,23 @@ package models;
 
 public class OrderItem {
     private int orderItemId;
-    private int orderId;
+    private String orderId;
     private int productId;
     private int quantity;
     private double unitPrice;
 
-    // Constructors
-    public OrderItem() {}
+    public OrderItem() {
+    }
 
-    public OrderItem(int orderItemId, int orderId, int productId, int quantity, double unitPrice) {
+    // Getters and Setters
+
+    public OrderItem(int orderItemId, String orderId, int productId, int quantity, double unitPrice) {
         this.orderItemId = orderItemId;
-        this.orderId = orderId;
         this.productId = productId;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
     }
 
-    // Getters and Setters
     public int getOrderItemId() {
         return orderItemId;
     }
@@ -27,11 +27,12 @@ public class OrderItem {
         this.orderItemId = orderItemId;
     }
 
-    public int getOrderId() {
+
+    public String getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(int orderId) {
+    public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
 
@@ -57,10 +58,5 @@ public class OrderItem {
 
     public void setUnitPrice(double unitPrice) {
         this.unitPrice = unitPrice;
-    }
-
-    // Optional: total price for convenience
-    public double getTotalPrice() {
-        return quantity * unitPrice;
     }
 }

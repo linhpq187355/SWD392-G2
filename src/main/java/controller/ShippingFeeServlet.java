@@ -24,14 +24,15 @@ public class ShippingFeeServlet extends HttpServlet {
             while ((line = reader.readLine()) != null) sb.append(line);
 
             JsonObject json = JsonParser.parseString(sb.toString()).getAsJsonObject();
+
             int toDistrictId = json.get("districtId").getAsInt();
             String toWardCode = json.get("wardCode").getAsString();
 
             // --- Log để kiểm tra ---
-            System.out.println("✅ Nhận districtId = " + toDistrictId + ", wardCode = " + toWardCode);
-
+            System.out.println("✅ Nhận districtId = " + toDistrictId);
+            System.out.println("✅ Nhận wardCode = " + toWardCode);
             // --- GHN constants ---
-            int fromDistrictId = 1808  ; // ví dụ Gò Vấp
+            int fromDistrictId = 1808  ;
             String fromWardCode;
             fromWardCode = "1B1919";
             int serviceId = ghnShippingService.getAvailableServiceId(fromDistrictId, toDistrictId);

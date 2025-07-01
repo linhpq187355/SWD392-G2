@@ -1,4 +1,5 @@
-<%--
+<%@ page import="models.CartItem" %>
+<%@ page import="java.util.List" %><%--
   Created by IntelliJ IDEA.
   User: feedc
   Date: 6/27/2025
@@ -12,14 +13,14 @@
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
     <div class="container">
-        <a class="navbar-brand" href="${pageContext.request.contextPath}/HomePage">Shop<span>Online</span></a>
+        <a class="navbar-brand" href="${pageContext.request.contextPath}/homePage">Shop<span>Online</span></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link active" href="${pageContext.request.contextPath}/HomePage">Trang chủ</a>
+                    <a class="nav-link active" href="${pageContext.request.contextPath}/homePage">Trang chủ</a>
                 </li>
                 <li class="nav-item"><a class="nav-link" href="#">Sản phẩm</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Danh mục</a></li>
@@ -31,20 +32,10 @@
                 <a href="#" class="btn btn-outline-secondary me-2"><i class="fas fa-search"></i></a>
                 <a href="${pageContext.request.contextPath}/cartView" class="btn btn-outline-secondary position-relative">
                     <i class="fas fa-shopping-cart"></i>
-
-                    <c:set var="totalQuantity" value="0"/>
-                    <c:forEach var="item" items="${sessionScope.cartItems}">
-                        <c:set var="totalQuantity" value="${totalQuantity + item.quantity}" />
-                    </c:forEach>
-
-                    <c:if test="${totalQuantity > 0}">
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                    ${totalQuantity}
-            </span>
-                    </c:if>
                 </a>
             </div>
         </div>
     </div>
 </nav>
+
 </html>

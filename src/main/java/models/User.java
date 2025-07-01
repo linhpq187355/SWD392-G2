@@ -6,27 +6,67 @@ public class User {
     private int userId;
     private String email;
     private String password;
-    private String firstName;
-    private String lastName;
+    private String phone;
+    private String gender;
+    private String fullName;
+    private String wardId;
+    private  String addressDetail;
     private int roleId;
     private String googleId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
+    private int districtId;
+    private int provinceId;
     // Constructors
     public User() {}
 
-    public User(int userId, String email, String password, String firstName, String lastName,
-                int roleId, String googleId, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public User(int userId, String email, String phone, String password, String gender, String fullName, String wardId, String addressDetail, int roleId, String googleId, LocalDateTime createdAt, LocalDateTime updatedAt,int districtId, int provinceId) {
         this.userId = userId;
         this.email = email;
+        this.phone = phone;
         this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.gender = gender;
+        this.fullName = fullName;
+        this.wardId = wardId;
+        this.addressDetail = addressDetail;
         this.roleId = roleId;
         this.googleId = googleId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.districtId = districtId;
+        this.provinceId = provinceId;
+    }
+
+    public int getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(int districtId) {
+        this.districtId = districtId;
+    }
+
+    public int getProvinceId() {
+        return provinceId;
+    }
+
+    public void setProvinceId(int provinceId) {
+        this.provinceId = provinceId;
+    }
+
+    public String getWardId() {
+        return wardId;
+    }
+
+    public void setWardId(String wardId) {
+        this.wardId = wardId;
+    }
+
+    public String getAddressDetail() {
+        return addressDetail;
+    }
+
+    public void setAddressDetail(String addressDetail) {
+        this.addressDetail = addressDetail;
     }
 
     // Getters and Setters
@@ -54,20 +94,28 @@ public class User {
         this.password = password;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getGender() {
+        return gender;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public int getRoleId() {

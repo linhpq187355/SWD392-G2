@@ -1,47 +1,53 @@
 package models;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.List;
 
 public class Product {
-    private int productId;
+    private int id;
+    private String code;
     private String name;
     private String description;
-    private double price;
+    private double originalPrice;
+    private double salePrice;
     private int stock;
-    private int categoryId;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private String createdBy;
-    private String img;
-    private String cate;
-    // Constructors
+    private boolean isActive;
+    private int createdBy;
+    private LocalDate createdAt;
+    private LocalDate updatedAt;
+    private Category category;
+    private List<String> images;
+
     public Product() {}
 
-    public Product(int productId, String name, String description, double price, int stock,
-                   int categoryId, LocalDateTime createdAt, LocalDateTime updatedAt, String createdBy) {
-        this.productId = productId;
+    public Product(int id, String code, String name, String description, int stock, double originalPrice, double salePrice, boolean isActive, int createdBy, LocalDate updatedAt, LocalDate createdAt) {
+        this.id = id;
+        this.code = code;
         this.name = name;
         this.description = description;
-        this.price = price;
         this.stock = stock;
-        this.categoryId = categoryId;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.originalPrice = originalPrice;
+        this.salePrice = salePrice;
+        this.isActive = isActive;
         this.createdBy = createdBy;
-    }
-    public String getImg() { return img; }
-    public void setImg(String img) { this.img = img; }
-
-    public String getCate() { return cate; }
-    public void setCate(String cate) { this.cate = cate; }
-
-    // Getters and Setters
-    public int getProductId() {
-        return productId;
+        this.updatedAt = updatedAt;
+        this.createdAt = createdAt;
     }
 
-    public void setProductId(int productId) {
-        this.productId = productId;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getName() {
@@ -60,14 +66,6 @@ public class Product {
         this.description = description;
     }
 
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
     public int getStock() {
         return stock;
     }
@@ -76,35 +74,85 @@ public class Product {
         this.stock = stock;
     }
 
-    public int getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public String getCreatedBy() {
+    public int getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(String createdBy) {
+    public void setCreatedBy(int createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public LocalDate getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDate createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDate getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDate updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public double getOriginalPrice() {
+        return originalPrice;
+    }
+
+    public void setOriginalPrice(double originalPrice) {
+        this.originalPrice = originalPrice;
+    }
+
+    public double getSalePrice() {
+        return salePrice;
+    }
+
+    public void setSalePrice(double salePrice) {
+        this.salePrice = salePrice;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", originalPrice=" + originalPrice +
+                ", salePrice=" + salePrice +
+                ", stock=" + stock +
+                ", isActive=" + isActive +
+                ", createdBy=" + createdBy +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", category=" + category +
+                ", images=" + images +
+                '}';
     }
 }

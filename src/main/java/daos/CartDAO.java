@@ -2,17 +2,18 @@ package daos;
 
 import models.Cart;
 import models.CartItem;
+import models.Category;
 import models.Product;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
-public class CartDAO extends DBContext {
 
+public class CartDAO extends DBContext {
+   ProductDAO productDAO = new ProductDAO();
     public Cart getCartByUserId(int userId) {
         String sql = "SELECT * FROM Cart WHERE userId = ?";
         PreparedStatement ps = null;
@@ -46,6 +47,17 @@ public class CartDAO extends DBContext {
 
         return null;
     }
+
+    public void createCartForUser(int userId) {
+        String sql = "INSERT INTO Cart (userId, createdAt, updatedAt) VALUES (?, GETDATE(), GETDATE())";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void clearCart(int cartId) {
         String sql = "DELETE FROM CartItem WHERE cartId = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -55,17 +67,37 @@ public class CartDAO extends DBContext {
             throw new RuntimeException("Error clearing cart", e);
         }
     }
-    public void addCartItem(int cartId, int productId, int quantity) {
-        String sql = "INSERT INTO CartItem (cartId, productId, quantity) VALUES (?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, cartId);
-            ps.setInt(2, productId);
-            ps.setInt(3, quantity);
-            ps.executeUpdate();
+
+    public void addCartItem(int cartId, int id, int quantity) {
+        String checkSql = "SELECT quantity FROM CartItem WHERE cartId = ? AND productId = ?";
+        String updateSql = "UPDATE CartItem SET quantity = quantity + ? WHERE cartId = ? AND productId = ?";
+        String insertSql = "INSERT INTO CartItem (cartId, productId, quantity) VALUES (?, ?, ?)";
+
+        try {
+            PreparedStatement checkStmt = connection.prepareStatement(checkSql);
+            checkStmt.setInt(1, cartId);
+            checkStmt.setInt(2, id);
+            ResultSet rs = checkStmt.executeQuery();
+
+            if (rs.next()) {
+                PreparedStatement updateStmt = connection.prepareStatement(updateSql);
+                updateStmt.setInt(1, quantity);
+                updateStmt.setInt(2, cartId);
+                updateStmt.setInt(3, id);
+                updateStmt.executeUpdate();
+            } else {
+                // Chưa có → Thêm mới
+                PreparedStatement insertStmt = connection.prepareStatement(insertSql);
+                insertStmt.setInt(1, cartId);
+                insertStmt.setInt(2, id);
+                insertStmt.setInt(3, quantity);
+                insertStmt.executeUpdate();
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Error adding cart item", e);
         }
     }
+
 
     public void updateCartItem(int cartItemId, int quantity) {
         String sql = "UPDATE CartItem SET quantity = ? WHERE cartItemId = ?";
@@ -87,47 +119,61 @@ public class CartDAO extends DBContext {
             throw new RuntimeException("Error removing cart item", e);
         }
     }
-    public Product getProductById(int productId) {
-        String sql =
-                "SELECT p.productId, p.name, p.description, p.price, p.stock, p.createdBy, " +
-                        "p.createdAt, p.updatedAt, p.categoryId, " +
-                        "i.url AS img, " +
-                        "c.description AS cate " +
-                        "FROM Product p " +
-                        "LEFT JOIN Image i ON p.productId = i.productId " +
-                        "LEFT JOIN Category c ON p.categoryId = c.categoryId " +
-                        "WHERE p.productId = ?";
 
+    public Product getProductById(int id) {
+        String sql =
+                "SELECT p.id, p.productCode, p.name, p.description, p.originalPrice, p.salePrice, p.stock, " +
+                        "p.createdBy, p.createdAt, p.updatedAt, p.categoryId, " +
+                        "s.name AS cateName, s.settingId AS cateId " +
+                        "FROM Product p " +
+                        "LEFT JOIN Setting s ON p.categoryId = s.settingId AND s.type = 'category' " +
+                        "WHERE p.id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, productId);
+            ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
                 Product product = new Product();
-                product.setProductId(rs.getInt("productId"));
+
+                product.setId(rs.getInt("id"));
+                product.setCode(rs.getString("productCode"));
                 product.setName(rs.getString("name"));
                 product.setDescription(rs.getString("description"));
-                product.setPrice(rs.getDouble("price"));
+                product.setOriginalPrice(rs.getDouble("originalPrice"));
+                product.setSalePrice(rs.getDouble("salePrice"));
                 product.setStock(rs.getInt("stock"));
-                product.setCreatedBy(rs.getString("createdBy"));
-                product.setCreatedAt(rs.getTimestamp("createdAt").toLocalDateTime());
-                product.setUpdatedAt(rs.getTimestamp("updatedAt").toLocalDateTime());
-                product.setCategoryId(rs.getInt("categoryId"));
+                product.setCreatedBy(rs.getInt("createdBy"));
 
-                // chỉ gọi nếu bạn đã thêm field setter tương ứng
-                product.setImg(rs.getString("img"));
-                product.setCate(rs.getString("cate"));
+                Timestamp created = rs.getTimestamp("createdAt");
+                if (created != null) {
+                    product.setCreatedAt(created.toLocalDateTime().toLocalDate());
+                }
+
+                Timestamp updated = rs.getTimestamp("updatedAt");
+                if (updated != null) {
+                    product.setUpdatedAt(updated.toLocalDateTime().toLocalDate());
+                }
+
+                Category category = new Category();
+                category.setId(rs.getInt("cateId"));
+                category.setName(rs.getString("cateName"));
+                product.setCategory(category);
+
+                // Gọi DAO lấy danh sách ảnh
+                product.setImages(productDAO.getProductImages(id)); // ← gọi hàm bạn đã có
 
                 return product;
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error fetching product with details", e);
+            throw new RuntimeException("❌ Lỗi khi lấy sản phẩm theo ID", e);
         }
 
         return null;
     }
+
+
 
     public List<CartItem> getCartItemsByCartId(int cartId) {
         List<CartItem> items = new ArrayList<>();
@@ -148,40 +194,6 @@ public class CartDAO extends DBContext {
         }
         return items;
     }
-    public static void main(String[] args) {
-        CartDAO dao = new CartDAO();
-        int userId = 2;
-        int testProductId = 4;
-
-        Cart cart = dao.getCartByUserId(userId);
-        if (cart == null) {
-            System.out.println("❌ Cart not found");
-            return;
-        }
-
-        int cartId = cart.getCartId();
-        System.out.println("✅ Cart found: " + cartId);
-
-        // Add product
-        dao.addCartItem(cartId, testProductId, 2);
-        System.out.println("✅ Added product to cart");
-
-        // List items
-        List<CartItem> items = dao.getCartItemsByCartId(cartId);
-        for (CartItem i : items) {
-            System.out.printf("🛒 Item: cartItemId=%d, productId=%d, quantity=%d%n",
-                    i.getCartItemId(), i.getProductId(), i.getQuantity());
-        }
-
-        // Update first item
-        if (!items.isEmpty()) {
-            dao.updateCartItem(items.get(0).getCartItemId(), 5);
-            System.out.println("✏️ Updated quantity to 5");
-        }
 
 
-
-
-    }
 }
-
