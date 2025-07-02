@@ -3,7 +3,6 @@ package services;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
-import services.AutoAssignScheduler;
 
 @WebListener
 public class SchedulerListener implements ServletContextListener {

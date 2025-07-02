@@ -1,6 +1,6 @@
 package services;
 
-import daos.SettingDao;
+import daos.SettingDAO;
 import models.Order;
 import models.Setting;
 
@@ -13,10 +13,10 @@ public class AddressService {
      * @param order Đối tượng Order để điền thông tin vào.
      */
 
-    private final SettingDao settingDao;
+    private final SettingDAO settingDao;
 
     public AddressService() {
-        this.settingDao = new SettingDao();
+        this.settingDao = new SettingDAO();
     }
 
     public void parseFullAddress(String fullAddress, Order order) {

@@ -13,27 +13,26 @@ public class SettingService {
         return settingDAO.getAllCategory();
     }
   public SettingService() {
-        this.settingDao = new SettingDao();
     }
 
     public List<Setting> getAllProvinces() {
-        return settingDao.getSettingsByType("province");
+        return settingDAO.getSettingsByType("province");
     }
 
     public List<Setting> getDistrictsByProvinceId(int provinceId) {
-        return settingDao.getSettingsByParentId(provinceId);
+        return settingDAO.getSettingsByParentId(provinceId);
     }
 
     public List<Setting> getWardsByDistrictId(int districtId) {
-        return settingDao.getSettingsByParentId(districtId);
+        return settingDAO.getSettingsByParentId(districtId);
     }
 
     public List<Setting> getOrderStatuses() {
-        return settingDao.getSettingsByType("order_status");
+        return settingDAO.getSettingsByType("order_status");
     }
 
     public String getLocationNameById(int id) {
-        Setting setting = settingDao.getSettingById(id);
+        Setting setting = settingDAO.getSettingById(id);
         return setting != null ? setting.getName() : "";
     }
 

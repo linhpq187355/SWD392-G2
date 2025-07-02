@@ -1,15 +1,14 @@
 package controller;
 
 import models.Order;
+import models.OrderUpdateDTO;
 import models.Setting;
-import services.AddressService;
-import services.OrderService;
-import services.SettingService;
+import models.User;
+import services.*;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import services.ValidationException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,12 +22,13 @@ public class OrderServlet extends HttpServlet {
     private OrderService orderService;
     private SettingService settingService;
     private AddressService addressService;
-
+    private UserService userService;
     @Override
     public void init() {
         orderService = new OrderService();
         settingService = new SettingService();
         addressService = new AddressService();
+        userService = new UserService();
     }
 
     @Override
@@ -36,7 +36,6 @@ public class OrderServlet extends HttpServlet {
             throws ServletException, IOException {
         String servletPath = request.getServletPath();
 
-        // API Endpoint để lấy dữ liệu địa chỉ động (AJAX)
         if ("/api/locations".equals(servletPath)) {
             handleLocationApi(request, response);
             return;
@@ -58,7 +57,6 @@ public class OrderServlet extends HttpServlet {
         }
     }
 
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -71,34 +69,16 @@ public class OrderServlet extends HttpServlet {
     }
 
     private void handleOrderList(HttpServletRequest request, HttpServletResponse response)
-                throws ServletException, IOException {
-            HttpSession session = request.getSession();
-            if (session.getAttribute("userRole") == null || session.getAttribute("userId") == null) {
-                session.setAttribute("userRole", "Customer"); // Hoặc "Customer"
-                session.setAttribute("userId", 2);
-            }
-
-            if (session == null || session.getAttribute("userRole") == null || session.getAttribute("userId") == null) {
-                response.sendRedirect("/login.jsp");
+                throws IOException {
+            HttpSession session = request.getSession(false);
+            if (session == null || !(session.getAttribute("user") instanceof User user)) {
+                response.sendRedirect(request.getContextPath() + "/login");
                 return;
             }
 
-            String role = (String) session.getAttribute("userRole");
-            int userId = (int) session.getAttribute("userId");
-
-            String search = request.getParameter("search");
-
-            List<Order> orders = null;
-
+            String role = userService.getUserRole(user);
+            List<Order> orders = orderService.getOrdersForUser(user.getUserId(), role);
             try {
-                if (search != null && !search.trim().isEmpty()) {
-                    orders = orderService.searchOrders(search);
-                } else if ("Staff".equalsIgnoreCase(role)) {
-                    orders = orderService.getOrdersAssignedToSales(userId);
-                } else if ("Customer".equalsIgnoreCase(role)) {
-                    orders = orderService.getOrdersByCustomer(userId);
-                }
-
                 if (orders == null || orders.isEmpty()) {
                     request.setAttribute("message", "No orders found.");
                 } else {
@@ -108,7 +88,6 @@ public class OrderServlet extends HttpServlet {
                 request.setAttribute("listStatus", listStatus);
                 request.setAttribute("userRole", role);
                 request.getRequestDispatcher("/orderList.jsp").forward(request, response);
-
             } catch (Exception e) {
                 e.printStackTrace();
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
@@ -119,171 +98,79 @@ public class OrderServlet extends HttpServlet {
             throws ServletException, IOException {
         String orderId = request.getParameter("id");
         HttpSession session = request.getSession(false);
-
-        // Giả lập session
-        if (session.getAttribute("userRole") == null || session.getAttribute("userId") == null) {
-            session.setAttribute("userRole", "Customer"); // Hoặc "Customer"
-            session.setAttribute("userId", 2);
+        if (session == null || !(session.getAttribute("user") instanceof User user)) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
         }
-
-        // Tạm thời bỏ qua kiểm tra quyền để tập trung vào logic
-        // String role = (String) session.getAttribute("userRole");
-        // int userId = (int) session.getAttribute("userId");
-
+        String role = userService.getUserRole(user);
         Order order = orderService.getOrderForEdit(orderId);
-
         if (order == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Order not found");
             return;
         }
-
-        // Chuẩn bị dữ liệu cho các dropdown địa chỉ
+        if (!userService.checkRoleForUpdateOrder(user.getUserId(), role, orderId)) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "No permission to edit order");
+            return;
+        }
         List<Setting> provinces = settingService.getAllProvinces();
         request.setAttribute("order", order);
         request.setAttribute("provinces", provinces);
-
-        // Lấy danh sách trạng thái (ví dụ)
         List<Setting> statuses = settingService.getOrderStatuses();
         request.setAttribute("statuses", statuses);
-
-
+        request.setAttribute("userRole", role);
         request.getRequestDispatcher("/orderUpdate.jsp").forward(request, response);
     }
 
     private void updateOrder(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Lấy tất cả tham số từ form
-        String orderId = request.getParameter("orderId");
-        String receiveName = request.getParameter("receiverName");
-        String receivePhone = request.getParameter("receiverPhone");
-        String receiveEmail = request.getParameter("receiverMail");
-        String province = request.getParameter("province");
-        String district = request.getParameter("district");
-        String ward = request.getParameter("ward");
-        String street = request.getParameter("street");
-        String note = request.getParameter("orderNotes");
-        int statusId = Integer.parseInt(request.getParameter("orderStatus"));
-        int provinceId = Integer.parseInt(province);
-        int districtId = Integer.parseInt(district);
-        int wardId = Integer.parseInt(ward);
-        // Lấy số lượng sản phẩm mới
+
+        OrderUpdateDTO dto = new OrderUpdateDTO();
+        dto.setOrderId(request.getParameter("orderId"));
+        dto.setReceiverName(request.getParameter("receiverName"));
+        dto.setReceiverPhone(request.getParameter("receiverPhone"));
+        dto.setReceiverMail(request.getParameter("receiverMail"));
+        dto.setProvinceId(Integer.parseInt(request.getParameter("province")));
+        dto.setDistrictId(Integer.parseInt(request.getParameter("district")));
+        dto.setWardId(Integer.parseInt(request.getParameter("ward")));
+        dto.setStreet(request.getParameter("street"));
+        dto.setOrderNotes(request.getParameter("orderNotes"));
+        dto.setStatusId(Integer.parseInt(request.getParameter("orderStatus")));
+
         Map<Integer, Integer> quantities = new HashMap<>();
         request.getParameterMap().forEach((key, value) -> {
             if (key.startsWith("quantity_")) {
-                String productIdRaw = key.substring(9);
-                int productId = Integer.parseInt(productIdRaw);
-                try {
-                    int quantity = Integer.parseInt(value[0]);
-                    quantities.put(productId, quantity);
-                } catch (NumberFormatException e) {
-                    // Bỏ qua số lượng không hợp lệ
-                }
+                int productId = Integer.parseInt(key.substring(9));
+                quantities.put(productId, Integer.parseInt(value[0]));
             }
         });
+        dto.setQuantities(quantities);
 
-        List<String> errors = new ArrayList<>();
-
-        // Validation cơ bản
-        if (receiveName == null || receiveName.trim().isEmpty()) {
-            errors.add("Receiver name is required.");
-        }
-        if (receivePhone == null || !receivePhone.matches("^\\d{10,11}$")) {
-            errors.add("Invalid phone number format.");
-        }
-
-        if (receiveEmail == null || receiveEmail.trim().isEmpty()) {
-            errors.add("Receiver email is required.");
-        } else if (!receiveEmail.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-            errors.add("Invalid email format.");
-        }
-
-        if (province == null || province.isEmpty()) {
-            errors.add("Province must be selected.");
-        }
-        if (district == null || district.isEmpty()) {
-            errors.add("District must be selected.");
-        }
-        if (ward == null || ward.isEmpty()) {
-            errors.add("Ward must be selected.");
-        }
-        if (street == null || street.trim().isEmpty()) {
-            errors.add("Street/House number is required.");
-        }
-
-        if (!errors.isEmpty()) {
-            // Nếu có lỗi thì load lại order gốc để giữ lại thông tin
-            Order order = orderService.getOrderForEdit(orderId);
-            if (order == null) {
-                order = new Order();
-                order.setOrderId(orderId);
-            }
-            // Gán lại các trường để hiển thị lại form
-            order.setReceiveName(receiveName);
-            order.setReceivePhone(receivePhone);
-            order.setReceiveEmail(receiveEmail);
-            order.setProvinceId(provinceId);
-            order.setDistrictId(districtId);
-            order.setWardId(wardId);
-            order.setStreet(street);
-            order.setNote(note);
-            order.setStatusId(statusId);
-
-            request.setAttribute("errors", errors);
-            request.setAttribute("order", order);
-            request.setAttribute("provinces", settingService.getAllProvinces());
-            request.getRequestDispatcher("/orderUpdate.jsp").forward(request, response);
-            return;
-        }
-
-        String provinceName = settingService.getLocationNameById(provinceId);
-        String districtName = settingService.getLocationNameById(districtId);
-        String wardName = settingService.getLocationNameById(wardId);
-        // Tạo đối tượng Order để update
-        Order orderToUpdate = new Order();
-        orderToUpdate.setOrderId(orderId);
-        orderToUpdate.setReceiveName(receiveName);
-        orderToUpdate.setReceivePhone(receivePhone);
-        orderToUpdate.setReceiveEmail(receiveEmail);
-        orderToUpdate.setReceiveAddress(addressService.combineAddressParts(street, wardName, districtName, provinceName));
-        orderToUpdate.setProvinceId(provinceId);
-        orderToUpdate.setDistrictId(districtId);
-        orderToUpdate.setWardId(wardId);
-        orderToUpdate.setStreet(street);
-        orderToUpdate.setNote(note);
-        orderToUpdate.setStatusId(statusId);
-        orderToUpdate.setProvince(provinceName);
-        orderToUpdate.setDistrict(districtName);
-        orderToUpdate.setWard(wardName);
         try {
-            // Gọi service update
-            orderService.updateOrder(orderToUpdate, quantities);
+            Order orderToUpdate = orderService.validateAndBuildOrderForUpdate(dto);
+            orderService.updateOrder(orderToUpdate, dto.getQuantities());
             response.sendRedirect(request.getContextPath() + "/orders?action=list&update_success=true");
         } catch (ValidationException ve) {
-            // 👉👉 Bắt lỗi VALIDATION và hiển thị lại form
-
-            Order order = orderService.getOrderForEdit(orderId);
-            if (order == null) {
-                order = orderToUpdate; // Dùng lại data user nhập
-            }
-
-            request.setAttribute("errors", ve.getErrorMessages()); // Lấy lỗi từ Service
-            request.setAttribute("order", order);
+            request.setAttribute("errors", ve.getErrorMessages());
+            Order originalOrder = orderService.getOrderForEdit(dto.getOrderId());
+            originalOrder.setReceiveName(dto.getReceiverName());
+            originalOrder.setReceivePhone(dto.getReceiverPhone());
+            originalOrder.setWardId(dto.getWardId());
+            originalOrder.setStreet(dto.getStreet());
+            originalOrder.setDistrictId(dto.getDistrictId());
+            originalOrder.setProvinceId(dto.getProvinceId());
+            originalOrder.setStatusId(dto.getStatusId());
+            originalOrder.setNote(dto.getOrderNotes());
+            request.setAttribute("order", originalOrder);
             request.setAttribute("provinces", settingService.getAllProvinces());
             request.getRequestDispatcher("/orderUpdate.jsp").forward(request, response);
-
         } catch (Exception e) {
-            errors.add("Update failed due to a system error: " + e.getMessage());
-            Order order = orderService.getOrderForEdit(orderId);
-            if (order == null) {
-                order = orderToUpdate; // Nếu lỗi DB thì dùng lại dữ liệu người dùng nhập
-            }
-            request.setAttribute("errors", errors);
-            request.setAttribute("order", order);
+            request.setAttribute("errors", List.of("Update failed due to a system error: " + e.getMessage()));
+            Order originalOrder = orderService.getOrderForEdit(dto.getOrderId());
+            request.setAttribute("order", originalOrder);
             request.setAttribute("provinces", settingService.getAllProvinces());
             request.getRequestDispatcher("/orderUpdate.jsp").forward(request, response);
         }
     }
-
     // API để lấy huyện và xã
     private void handleLocationApi(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String type = request.getParameter("type"); // "districts" or "wards"
@@ -296,10 +183,8 @@ public class OrderServlet extends HttpServlet {
         } else if ("wards".equals(type)) {
             locations = settingService.getWardsByDistrictId(parentId);
         }
-
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        // Simple JSON serialization
         StringBuilder json = new StringBuilder("[");
         for (int i = 0; i < locations.size(); i++) {
             Setting loc = locations.get(i);

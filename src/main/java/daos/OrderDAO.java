@@ -10,68 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class OrderDao extends DBContext {
-    public List<Order> getAllOrders() {
-        List<Order> list = new ArrayList<>();
-        String sql = "SELECT * FROM [Order]";
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(extractOrder(rs));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Order> getOrdersByStatus(int statusId) {
-        List<Order> list = new ArrayList<>();
-        String sql = "SELECT * FROM [Order] WHERE statusId = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, statusId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(extractOrder(rs));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Order> getOrdersSortedByDate(boolean ascending) {
-        List<Order> list = new ArrayList<>();
-        String order = ascending ? "ASC" : "DESC";
-        String sql = "SELECT * FROM [Order] ORDER BY createdAt " + order;
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(extractOrder(rs));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Order> searchOrders(String keyword) {
-        List<Order> list = new ArrayList<>();
-        String sql = "SELECT * FROM [Order] WHERE receiveName LIKE ? OR receiveEmail LIKE ? OR receiveAddress LIKE ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            String searchPattern = "%" + keyword + "%";
-            ps.setString(1, searchPattern);
-            ps.setString(2, searchPattern);
-            ps.setString(3, searchPattern);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(extractOrder(rs));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
+public class OrderDAO extends DBContext {
 
     public List<Order> getOrdersBySales(int salesId) {
         List<Order> list = new ArrayList<>();
@@ -94,7 +33,6 @@ public class OrderDao extends DBContext {
         return list;
     }
 
-    // Lấy đơn hàng theo Customer ID
     public List<Order> getOrdersByCustomer(int customerId) {
         List<Order> list = new ArrayList<>();
         String sql = "SELECT * FROM [Order] WHERE userId = ?";
@@ -142,7 +80,6 @@ public class OrderDao extends DBContext {
         }
         return null;
     }
-
 
     public List<OrderItemDetail> getOrderItemsWithProductInfo(String orderId) {
         List<OrderItemDetail> list = new ArrayList<>();
@@ -195,13 +132,12 @@ public class OrderDao extends DBContext {
     }
 
     public boolean updateOrderItemQuantities(String orderId, Map<Integer, Integer> quantities) throws SQLException {
-        String sql = "UPDATE OrderItem SET quantity = ? WHERE orderId = ? AND id = ?";
+        String sql = "UPDATE OrderItem SET quantity = ? WHERE orderId = ? AND productId = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             connection.setAutoCommit(false); // Bắt đầu transaction
             for (Map.Entry<Integer, Integer> entry : quantities.entrySet()) {
                 Integer productId = entry.getKey();
                 int newQuantity = entry.getValue();
-
                 ps.setInt(1, newQuantity);
                 ps.setString(2, orderId);
                 ps.setInt(3, productId);
@@ -217,7 +153,6 @@ public class OrderDao extends DBContext {
             connection.setAutoCommit(true); // Trả lại trạng thái mặc định
         }
     }
-
 
     private Order extractOrder(ResultSet rs) throws SQLException {
         Order o = new Order();

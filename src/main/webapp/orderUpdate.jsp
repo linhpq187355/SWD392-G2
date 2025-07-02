@@ -111,7 +111,7 @@
                 <td class="border border-gray-300 px-3 py-1 text-center">
                     <input type="number" name="quantity_${item.productId}" value="${item.quantity}" min="1"
                            class="w-20 text-center border rounded"
-                           <c:if test="${userRole == 'Staff'}">readonly</c:if>/>
+                           <c:if test="${userRole == 'Sales'}">readonly</c:if>/>
                     <script>console.log(useRole)</script>
                 </td>
                 <td class="border border-gray-300 px-3 py-1 text-right">

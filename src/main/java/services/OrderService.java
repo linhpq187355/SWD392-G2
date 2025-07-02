@@ -1,9 +1,10 @@
 package services;
 
-import daos.OrderDao;
+import daos.OrderDAO;
 import daos.ProductDAO;
 import models.Order;
 import models.OrderItemDetail;
+import models.OrderUpdateDTO;
 import models.Product;
 
 import java.sql.SQLException;
@@ -13,103 +14,54 @@ import java.util.Map;
 
 public class OrderService {
 
-    private final OrderDao orderDao;
+    private final OrderDAO orderDao;
     private final AddressService addressService;
+    private SettingService settingService;
     private final GhnService ghnService;
     private final ProductDAO productDao;
     public OrderService() {
         addressService = new AddressService();
-        orderDao = new OrderDao(); // Khởi tạo Dao
+        orderDao = new OrderDAO(); // Khởi tạo Dao
         ghnService = new GhnService();
         productDao = new ProductDAO();
+        settingService = new SettingService();
     }
 
-    // Lấy tất cả đơn hàng
-    public List<Order> getAllOrders() {
-        return orderDao.getAllOrders();
-    }
-
-    // Lấy đơn hàng theo statusId
-    public List<Order> getOrdersByStatus(int statusId) {
-        return orderDao.getOrdersByStatus(statusId);
-    }
-
-    // Lấy đơn hàng sắp xếp theo ngày tạo (tăng/giảm dần)
-    public List<Order> getOrdersSortedByDate(boolean ascending) {
-        return orderDao.getOrdersSortedByDate(ascending);
-    }
-
-    // Tìm kiếm đơn hàng theo từ khóa (name, email, address)
-    public List<Order> searchOrders(String keyword) {
-        return orderDao.searchOrders(keyword);
-    }
-
-    // Lấy đơn hàng của 1 customer cụ thể
     public List<Order> getOrdersByCustomer(int customerId) {
         return orderDao.getOrdersByCustomer(customerId);
     }
 
-    // Lấy đơn hàng được giao cho 1 sales cụ thể
     public List<Order> getOrdersAssignedToSales(int salesId) {
         return orderDao.getOrdersBySales(salesId);
     }
 
-    public Order getOrderById(String orderId) {
-        Order order = orderDao.getOrderById(orderId);
-        List<OrderItemDetail> itemDetails = orderDao.getOrderItemsWithProductInfo(orderId);
-        order.setItems(itemDetails); // Gán vào đối tượng Order
-        return order;
+    public List<Order> getOrdersForUser(int userId, String role) {
+        if ("Sales".equalsIgnoreCase(role)) {
+            return getOrdersAssignedToSales(userId);
+        }
+        if ("Customer".equalsIgnoreCase(role)) {
+            return getOrdersByCustomer(userId);
+        }
+        return new ArrayList<>();
     }
 
     public Order getOrderForEdit(String orderId) {
         Order order = orderDao.getOrderById(orderId);
         if (order != null) {
-            // Lấy danh sách sản phẩm
             List<OrderItemDetail> itemDetails = orderDao.getOrderItemsWithProductInfo(orderId);
             order.setItems(itemDetails);
-
-            // Phân tách địa chỉ
             addressService.parseFullAddress(order.getReceiveAddress(), order);
         }
         return order;
     }
 
-    /**
-     * Kiểm tra xem người dùng có quyền sửa đơn hàng không.
-     * @param userId ID người dùng
-     * @param role Vai trò người dùng (Sales, Customer)
-     * @param orderId ID đơn hàng
-     * @return true nếu có quyền, false nếu không.
-     */
-    public boolean hasPermissionToEdit(int userId, String role, String orderId) {
-        Order order = orderDao.getOrderById(orderId);
-        if (order == null) return false;
-
-        if ("Customer".equalsIgnoreCase(role)) {
-            // Khách hàng chỉ được sửa đơn của chính mình
-            return order.getUserId() == userId;
-        } else if ("Sales".equalsIgnoreCase(role)) {
-            // Sales được sửa đơn hàng được gán cho mình
-            // (Cần bổ sung logic kiểm tra trong OrderAssignmentDAO)
-            // Tạm thời giả định là sales có quyền với mọi đơn
-            return true;
-        }
-        return false;
-    }
-
     public void updateOrder(Order orderToUpdate, Map<Integer, Integer> quantities) throws Exception {
-        // 1. Validate Business Rules
         validateBusinessRules(orderToUpdate, quantities);
-
-        // 2. Lấy thông tin đơn hàng gốc để so sánh
         Order originalOrder = orderDao.getOrderById(orderToUpdate.getOrderId());
         if (originalOrder == null) {
             throw new Exception("Order not found.");
         }
-
-        // 3. Thực hiện cập nhật trong CSDL (sử dụng transaction)
         try {
-            // DAO đã được thiết kế để xử lý transaction
             orderDao.updateOrderDetails(orderToUpdate);
             if (quantities != null && !quantities.isEmpty()) {
                 orderDao.updateOrderItemQuantities(orderToUpdate.getOrderId(), quantities);
@@ -119,42 +71,87 @@ public class OrderService {
             throw new Exception("Database update failed. " + e.getMessage());
         }
 
-        // 4. (UC Step 9) Tích hợp GHN nếu có thay đổi liên quan đến vận chuyển
         if (isShippingInfoChanged(originalOrder, orderToUpdate)) {
             try {
                 ghnService.updateOrderOnGhn(orderToUpdate);
             } catch (GhnException e) {
-                // (UC Exception E9.1) Xử lý khi GHN có lỗi
                 System.err.println("GHN Integration Error: " + e.getMessage());
                 orderDao.markOrderForManualSync(orderToUpdate.getOrderId(), e.getMessage()); // Đánh dấu đơn hàng cần đồng bộ lại
-                // Ném lại lỗi để Controller hiển thị thông báo phù hợp
                 throw e;
             }
         }
     }
 
-    private void validateBusinessRules(Order order, Map<Integer, Integer> quantities) throws ValidationException {
+    public Order validateAndBuildOrderForUpdate(OrderUpdateDTO dto) throws ValidationException {
         List<String> errors = new ArrayList<>();
 
+        if (dto.getReceiverName() == null || dto.getReceiverName().trim().isEmpty()) {
+            errors.add("Receiver name is required.");
+        }
+        if (dto.getReceiverPhone() == null || !dto.getReceiverPhone().matches("^\\d{10,11}$")) {
+            errors.add("Invalid phone number format.");
+        }
+        if (dto.getReceiverMail() == null || dto.getReceiverMail().trim().isEmpty()) {
+            errors.add("Receiver email is required.");
+        } else if (!dto.getReceiverMail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            errors.add("Invalid email format.");
+        }
+        if (dto.getProvinceId() == 0) {
+            errors.add("Province must be selected.");
+        }
+        if (dto.getDistrictId() == 0) {
+            errors.add("District must be selected.");
+        }
+        if (dto.getWardId() == 0) {
+            errors.add("Ward must be selected.");
+        }
+        if (dto.getStreet() == null || dto.getStreet().trim().isEmpty()) {
+            errors.add("Street/House number is required.");
+        }
+
+        if (!errors.isEmpty()) {
+            throw new ValidationException(errors);
+        }
+
+        String provinceName = settingService.getLocationNameById(dto.getProvinceId());
+        String districtName = settingService.getLocationNameById(dto.getDistrictId());
+        String wardName = settingService.getLocationNameById(dto.getWardId());
+        String fullAddress = addressService.combineAddressParts(dto.getStreet(), wardName, districtName, provinceName);
+
+        Order orderToUpdate = new Order();
+        orderToUpdate.setOrderId(dto.getOrderId());
+        orderToUpdate.setReceiveName(dto.getReceiverName());
+        orderToUpdate.setReceivePhone(dto.getReceiverPhone());
+        orderToUpdate.setReceiveEmail(dto.getReceiverMail());
+        orderToUpdate.setReceiveAddress(fullAddress);
+        orderToUpdate.setProvinceId(dto.getProvinceId());
+        orderToUpdate.setDistrictId(dto.getDistrictId());
+        orderToUpdate.setWardId(dto.getWardId());
+        orderToUpdate.setStreet(dto.getStreet());
+        orderToUpdate.setNote(dto.getOrderNotes());
+        orderToUpdate.setStatusId(dto.getStatusId());
+        orderToUpdate.setProvince(provinceName);
+        orderToUpdate.setDistrict(districtName);
+        orderToUpdate.setWard(wardName);
+
+        return orderToUpdate;
+    }
+
+    private void validateBusinessRules(Order orderToUpdate, Map<Integer, Integer> quantities) throws ValidationException {
+        List<String> errors = new ArrayList<>();
         if (quantities != null) {
             for (Map.Entry<Integer, Integer> item : quantities.entrySet()) {
                 Integer productId = item.getKey();
                 int requestedQuantity = item.getValue();
 
                 Product product = getProduct(productId);
-
-                // Kiểm tra sản phẩm có tồn tại không
                 if (product == null) {
                     errors.add("Sản phẩm với mã '" + productId + "' không tồn tại.");
-                    continue; // Bỏ qua các kiểm tra khác cho sản phẩm này
+                    continue;
                 }
-
-                // **QUAN TRỌNG: Kiểm tra sản phẩm có đang hoạt động không (`isActive`)**
                 if (!product.isActive()) {
                     errors.add("Sản phẩm '" + product.getName() + "' hiện không được kinh doanh.");
                 }
-
-                // Kiểm tra tồn kho
                 int availableStock = product.getStock();
                 if (requestedQuantity > availableStock) {
                     errors.add("Tồn kho không đủ cho sản phẩm '" + product.getName() + "'. Hiện có: " + availableStock + ", Yêu cầu: " + requestedQuantity);
@@ -182,8 +179,6 @@ public class OrderService {
         if (!original.getReceiveName().equals(updated.getReceiveName())) return true;
         if (!original.getReceivePhone().equals(updated.getReceivePhone())) return true;
         if (!original.getReceiveAddress().equals(updated.getReceiveAddress())) return true;
-        // Kiểm tra nếu trạng thái thay đổi là trạng thái liên quan đến GHN
-        // if (isShippingStatus(updated.getStatusId())) return true;
         return false;
     }
 }

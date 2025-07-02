@@ -137,7 +137,7 @@
         Already have an account? <a href="login.jsp">Login</a>
     </div>
 
-    <a href="https://accounts.google.com/o/oauth2/auth?scope=openid%20email%20profile&redirect_uri=http://localhost:8080/SWD392_G2_war_exploded/user?action=google&response_type=code&client_id=749837398859-0v26hcmekbpe0t9b3sgs7ce15pmfqufr.apps.googleusercontent.com&approval_prompt=force&access_type=offline" class="google-button">
+    <a href="https://accounts.google.com/o/oauth2/auth?scope=openid%20email%20profile&redirect_uri=http://localhost:9999/SWD392_G2_war_exploded/user?action=google&response_type=code&client_id=749837398859-0v26hcmekbpe0t9b3sgs7ce15pmfqufr.apps.googleusercontent.com&approval_prompt=force&access_type=offline" class="google-button">
         Or Login with Google
     </a>
 

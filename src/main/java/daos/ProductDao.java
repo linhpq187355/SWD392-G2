@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductDAO extends DBContext{
+
     public List<Product> getAllProduct() {
         String sql = "select p.id, p.productCode, p.name, p.description, p.originalPrice, p.salePrice, p.stock, p.isActive, p.createdAt, p.categoryId, s.name [catName]\n" +
                 "from Product p\n" +

@@ -4,7 +4,7 @@ import models.Address;
 
 import java.sql.*;
 
-public class AddressDao extends DBContext {
+public class AddressDAO extends DBContext {
 
     public boolean updateAddress(Address address)  {
         String sql = "UPDATE [Address] SET addressDetail = ?, updatedAt = GETDATE() WHERE userId = ?";

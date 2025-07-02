@@ -1,10 +1,11 @@
 package daos;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.sql.Types;
 
-public class OrderAssignmentDao extends DBContext {
+public class OrderAssignmentDAO extends DBContext {
 
     /**
      * Gán staff với order.
@@ -37,5 +38,25 @@ public class OrderAssignmentDao extends DBContext {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public boolean isOrderAssignedToSales(String orderId, int salesId) {
+        String sql = """
+            SELECT COUNT(*) 
+            FROM OrderAssignment 
+            WHERE orderId = ? AND assignedTo = ?
+            """;
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, orderId);
+            ps.setInt(2, salesId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

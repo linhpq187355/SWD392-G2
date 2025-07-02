@@ -1,8 +1,9 @@
 package services;
 
-import daos.AddressDao;
-import daos.UserDAO;
+import daos.*;
 import models.Address;
+import models.Order;
+import models.Setting;
 import models.User;
 import org.json.JSONObject;
 
@@ -12,7 +13,10 @@ import java.net.URL;
 
 public class UserService {
     private final UserDAO userDAO = new UserDAO();
-    private final AddressDao addressDAO = new AddressDao();
+    private final AddressDAO addressDAO = new AddressDAO();
+    private final SettingDAO settingDAO = new SettingDAO();
+    private final OrderDAO orderDAO = new OrderDAO();
+    private final OrderAssignmentDAO orderAssignmentDAO = new OrderAssignmentDAO();
 
     public boolean login(User user) {
         User dbUser = userDAO.findByEmail(user.getEmail());
@@ -21,6 +25,28 @@ public class UserService {
             user.setFullName(dbUser.getFullName());
             user.setRoleId(dbUser.getRoleId());
             return true;
+        }
+        return false;
+    }
+
+    public String getUserRole(User user) {
+        String email = user.getEmail();
+        User dbUser = userDAO.findByEmail(email);
+        if (dbUser != null) {
+            Setting setting = settingDAO.getSettingById(dbUser.getRoleId());
+            return setting.getName();
+        } else {
+            return null;
+        }
+    }
+
+    public boolean checkRoleForUpdateOrder(int userId, String role, String orderId){
+        if(role.equals("Customer")) {
+            Order order = orderDAO.getOrderById(orderId);
+            return order.getUserId() == userId;
+        }
+        if(role.equals("Sales")) {
+            return orderAssignmentDAO.isOrderAssignedToSales(orderId, userId);
         }
         return false;
     }
